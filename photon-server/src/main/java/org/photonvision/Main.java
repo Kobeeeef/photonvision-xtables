@@ -27,6 +27,7 @@ import org.photonvision.common.configuration.CameraConfiguration;
 import org.photonvision.common.configuration.ConfigManager;
 import org.photonvision.common.configuration.NeuralNetworkModelManager;
 import org.photonvision.common.dataflow.networktables.NetworkTablesManager;
+import org.photonvision.common.dataflow.networktables.XTablesManager;
 import org.photonvision.common.hardware.HardwareManager;
 import org.photonvision.common.hardware.OsImageVersion;
 import org.photonvision.common.hardware.PiVersion;
@@ -283,6 +284,10 @@ public class Main {
         NetworkTablesManager.getInstance()
                 .setConfig(ConfigManager.getInstance().getConfig().getNetworkConfig());
         NetworkTablesManager.getInstance().registerTimedTasks();
+
+        logger.info("Loading XTABLES...");
+        XTablesManager.getInstance();
+
 
         if (isSmoketest) {
             logger.info("PhotonVision base functionality loaded -- smoketest complete");

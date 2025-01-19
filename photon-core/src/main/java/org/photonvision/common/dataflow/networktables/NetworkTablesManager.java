@@ -27,6 +27,7 @@ import edu.wpi.first.networktables.StringSubscriber;
 import java.io.IOException;
 import java.util.EnumSet;
 import java.util.HashMap;
+
 import org.photonvision.PhotonVersion;
 import org.photonvision.common.configuration.ConfigManager;
 import org.photonvision.common.configuration.NetworkConfig;

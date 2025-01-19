@@ -22,8 +22,10 @@ jobs:
           git config --global --add safe.directory /__w/photonvision-xtables/photonvision-xtables
       - name: Build PhotonLib
         run: ./gradlew photon-targeting:build photon-lib:build -Ponlylinuxarm64 -i -x test
+      - name: List Build Files
+        run: ls -R photon-lib/build/libs/
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
         with:
           name: photonlib-linuxarm64
-          path: build/libs/*linuxarm64*.jar
+          path: photon-lib/build/libs/*linuxarm64*.jar

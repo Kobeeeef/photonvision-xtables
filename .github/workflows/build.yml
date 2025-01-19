@@ -7,11 +7,6 @@ on:
       - 'v*'
   pull_request:
     branches: [ main ]
-  merge_group:
-
-concurrency:
-  group: ${{ github.workflow }}-${{ github.head_ref || github.ref }}
-  cancel-in-progress: true
 
 jobs:
   build-photonlib-docker:
@@ -24,15 +19,11 @@ jobs:
           fetch-depth: 0
       - name: Config Git
         run: |
-          git config --global --add safe.directory /__w/photonvision/photonvision
+          git config --global --add safe.directory /__w/photonvision-xtables/photonvision-xtables
       - name: Build PhotonLib
         run: ./gradlew photon-targeting:build photon-lib:build -Ponlylinuxarm64 -i -x test
-      - name: Publish
-        run: ./gradlew photon-lib:publish photon-targeting:publish -Ponlylinuxarm64
-        env:
-          ARTIFACTORY_API_KEY: ${{ secrets.ARTIFACTORY_API_KEY }}
-      - run: ./gradlew photon-lib:publish photon-targeting:publish -PcopyOfflineArtifacts -Ponlylinuxarm64
-      - uses: actions/upload-artifact@v4
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v4
         with:
-          name: maven-linuxarm64
-          path: build/outputs
+          name: photonlib-linuxarm64
+          path: build/libs/*linuxarm64*.jar

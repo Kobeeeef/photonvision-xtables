@@ -28,4 +28,4 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: photonlib-linuxarm64
-          path: photon-lib/build/libs/*linuxarm64*.jar
+          path: photon-lib/build/libs/photon-lib.jar

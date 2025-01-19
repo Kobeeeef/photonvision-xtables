@@ -9,23 +9,22 @@ on:
     branches: [ main ]
 
 jobs:
-  build-photonlib-docker:
+  build-photonvision:
     runs-on: ubuntu-22.04
-    container: wpilib/aarch64-cross-ubuntu:bullseye-22.04
-    name: "Photonlib - Build Docker - LinuxArm64"
+    name: "Build PhotonVision"
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-      - name: Config Git
-        run: |
-          git config --global --add safe.directory /__w/photonvision-xtables/photonvision-xtables
-      - name: Build PhotonLib
-        run: ./gradlew photon-targeting:build photon-lib:build -Ponlylinuxarm64 -i -x test
-      - name: List Build Files
-        run: ls -R photon-lib/build/libs/
+      - name: Set Up Java
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+      - name: Build PhotonVision
+        run: ./gradlew build shadowJar -x test
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: photonlib-linuxarm64
-          path: photon-lib/build/libs/photon-lib.jar
+          name: photonvision-jar
+          path: photon-server/build/libs/photonvision-all.jar

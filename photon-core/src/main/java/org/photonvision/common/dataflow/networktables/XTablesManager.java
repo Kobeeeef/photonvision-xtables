@@ -8,19 +8,24 @@ import org.photonvision.common.logging.Logger;
 import org.photonvision.common.util.TimedTaskManager;
 
 import java.util.HashMap;
+import java.util.concurrent.atomic.AtomicReference;
 
 public class XTablesManager {
     private static final Logger logger = new Logger(XTablesManager.class, LogGroup.NetworkTables);
 
-    private final XTablesClient xtClient;
+    private final AtomicReference<XTablesClient> xtClient = new AtomicReference<>();
     private static XTablesManager INSTANCE;
     public static final String ROOT_NAME = "photonvision.";
     private XTablesManager() {
-        xtClient = new XTablesClient();
+        new Thread(() -> {
+        logger.info("Initializing XTablesManager");
+        xtClient.set(new XTablesClient());
+        logger.info("XTablesManager initialized");
+        }).start();
     }
 
     public XTablesClient getXtClient() {
-        return xtClient;
+        return xtClient.get();
     }
 
     public static XTablesManager getInstance() {
@@ -33,9 +38,9 @@ public class XTablesManager {
     }
 
     public boolean isConnected() {
-        return xtClient != null && xtClient.getSocketMonitor().isConnected("REQUEST") &&
-                xtClient.getSocketMonitor().isConnected("PUSH") &&
-                xtClient.getSocketMonitor().isConnected("SUBSCRIBE");
+        return xtClient != null && xtClient.get().getSocketMonitor().isConnected("REQUEST") &&
+                xtClient.get().getSocketMonitor().isConnected("PUSH") &&
+                xtClient.get().getSocketMonitor().isConnected("SUBSCRIBE");
     }
 
     private void broadcastConnectedStatusImpl() {
@@ -44,7 +49,7 @@ public class XTablesManager {
 
         subMap.put("connected", isConnected());
         if (isConnected()) {
-            subMap.put("address", xtClient.getIp());
+            subMap.put("address", xtClient.get().getIp());
         }
 
         map.put("ntConnectionInfo", subMap);
@@ -54,7 +59,7 @@ public class XTablesManager {
 
 
     public void close() {
-        xtClient.shutdown();
+        xtClient.get().shutdown();
     }
 }
 

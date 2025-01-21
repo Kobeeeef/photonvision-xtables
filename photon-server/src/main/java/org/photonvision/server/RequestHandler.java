@@ -43,7 +43,6 @@ import org.photonvision.common.dataflow.DataChangeDestination;
 import org.photonvision.common.dataflow.DataChangeService;
 import org.photonvision.common.dataflow.events.IncomingWebSocketEvent;
 import org.photonvision.common.dataflow.events.OutgoingUIEvent;
-import org.photonvision.common.dataflow.networktables.NetworkTablesManager;
 import org.photonvision.common.dataflow.websocket.UIPhotonConfiguration;
 import org.photonvision.common.hardware.HardwareManager;
 import org.photonvision.common.hardware.Platform;
@@ -377,8 +376,6 @@ public class RequestHandler {
         ConfigManager.getInstance().requestSave();
 
         NetworkManager.getInstance().reinitialize();
-
-        NetworkTablesManager.getInstance().setConfig(config);
     }
 
     public static class UICameraSettingsRequest {

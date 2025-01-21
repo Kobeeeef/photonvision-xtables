@@ -35,7 +35,7 @@ public class TimeSyncManager {
     private TimeSyncClient m_client = null;
     private TimeSyncServer m_server = null;
 
-    private NetworkTableInstance ntInstance;
+
     IntegerPublisher m_offsetPub;
     IntegerPublisher m_rtt2Pub;
     IntegerPublisher m_pingsPub;
@@ -47,7 +47,6 @@ public class TimeSyncManager {
             logger.error("PhotonTargetingJNI was not loaded! Cannot do time-sync");
         }
 
-        this.ntInstance = kRootTable.getInstance();
 
         // Need this subtable to be unique per coprocessor. TODO: consider using MAC address or
         // something similar for metrics?

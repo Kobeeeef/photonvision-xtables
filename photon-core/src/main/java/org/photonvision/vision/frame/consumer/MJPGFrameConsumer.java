@@ -18,10 +18,10 @@
 package org.photonvision.vision.frame.consumer;
 
 import edu.wpi.first.cscore.*;
-import edu.wpi.first.networktables.NetworkTable;
-import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.util.PixelFormat;
 import java.util.ArrayList;
+
+import org.photonvision.common.dataflow.networktables.XTablesManager;
 import org.photonvision.common.util.math.MathUtils;
 import org.photonvision.vision.frame.StaticFrames;
 import org.photonvision.vision.opencv.CVMat;
@@ -36,13 +36,11 @@ public class MJPGFrameConsumer implements AutoCloseable {
 
     private VideoListener listener;
 
-    private final NetworkTable table;
+    private String key;
 
     public MJPGFrameConsumer(String sourceName, int width, int height, int port) {
         this.cvSource = new CvSource(sourceName, PixelFormat.kMJPEG, width, height, 30);
-        this.table =
-                NetworkTableInstance.getDefault().getTable("/CameraPublisher").getSubTable(sourceName);
-
+        this.key = "CameraPublisher." + sourceName;
         this.mjpegServer = new MjpegServer("serve_" + cvSource.getName(), port);
         mjpegServer.setSource(cvSource);
         mjpegServer.setCompression(75);
@@ -51,12 +49,15 @@ public class MJPGFrameConsumer implements AutoCloseable {
                 new VideoListener(
                         event -> {
                             if (event.kind == VideoEvent.Kind.kNetworkInterfacesChanged) {
-                                table.getEntry("source").setString("cv:");
-                                table.getEntry("streams");
-                                table.getEntry("connected").setBoolean(true);
-                                table.getEntry("mode").setString(videoModeToString(cvSource.getVideoMode()));
-                                table.getEntry("modes").setStringArray(getSourceModeValues(cvSource.getHandle()));
-                                updateStreamValues();
+                                try {
+                                    XTablesManager.getInstance().getXtClient().putString(XTablesManager.ROOT_NAME + "source", "cv:");
+                                    XTablesManager.getInstance().getXtClient().putBoolean(XTablesManager.ROOT_NAME + "connected", true);
+                                    XTablesManager.getInstance().getXtClient().putString(XTablesManager.ROOT_NAME + "mode", videoModeToString(cvSource.getVideoMode()));
+                                    XTablesManager.getInstance().getXtClient().putList(XTablesManager.ROOT_NAME + "modes", getSourceModeValues(cvSource.getHandle()));
+                                    updateStreamValues();
+                                }catch (Exception e) {
+                                    e.printStackTrace();
+                                }
                             }
                         },
                         0x4fff,
@@ -86,7 +87,12 @@ public class MJPGFrameConsumer implements AutoCloseable {
         }
 
         String[] streamAddresses = values.toArray(new String[0]);
-        table.getEntry("streams").setStringArray(streamAddresses);
+        try {
+            XTablesManager.getInstance().getXtClient().putList(XTablesManager.ROOT_NAME + "streams", streamAddresses);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
     }
 
     public MJPGFrameConsumer(String name, int port) {
@@ -147,7 +153,11 @@ public class MJPGFrameConsumer implements AutoCloseable {
 
     @Override
     public void close() {
-        table.getEntry("connected").setBoolean(false);
+        try {
+            XTablesManager.getInstance().getXtClient().putBoolean(XTablesManager.ROOT_NAME + "connected", false);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         mjpegServer.close();
         cvSource.close();
         listener.close();

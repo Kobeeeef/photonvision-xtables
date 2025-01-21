@@ -26,7 +26,7 @@ import org.photonvision.common.dataflow.DataChangeSubscriber;
 import org.photonvision.common.dataflow.events.DataChangeEvent;
 import org.photonvision.common.dataflow.events.IncomingWebSocketEvent;
 import org.photonvision.common.dataflow.events.OutgoingUIEvent;
-import org.photonvision.common.dataflow.networktables.NetworkTablesManager;
+import org.photonvision.common.dataflow.networktables.XTablesManager;
 import org.photonvision.common.dataflow.websocket.UIPhotonConfiguration;
 import org.photonvision.common.logging.Logger;
 
@@ -49,7 +49,7 @@ public class UIInboundSubscriber extends DataChangeSubscriber {
                         new OutgoingUIEvent<>("fullsettings", settings, incomingWSEvent.originContext);
                 DataChangeService.getInstance().publishEvent(message);
                 Logger.sendConnectedBacklog();
-                NetworkTablesManager.getInstance().broadcastConnectedStatus();
+                XTablesManager.getInstance().broadcastConnectedStatus();
             }
         }
     }

@@ -234,18 +234,3 @@ jobs:
           name: photon-targeting_jar-${{ matrix.artifact-name }}
           path: photon-targeting/build/libs
 
-
-  dispatch:
-    name: dispatch
-    needs: [build-photonlib-vendorjson, release]
-    runs-on: ubuntu-22.04
-    steps:
-      - uses: peter-evans/repository-dispatch@v3
-        if: |
-          github.repository == 'PhotonVision/photonvision' &&
-          startsWith(github.ref, 'refs/tags/v')
-        with:
-          token: ${{ secrets.VENDOR_JSON_REPO_PUSH_TOKEN }}
-          repository: PhotonVision/vendor-json-repo
-          event-type: tag
-          client-payload: '{"run_id": "${{ github.run_id }}", "package_version": "${{ github.ref_name }}"}'

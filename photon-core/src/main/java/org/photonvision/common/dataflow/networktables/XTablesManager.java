@@ -23,7 +23,9 @@ public class XTablesManager {
         logger.info("XTablesManager initialized");
         }).start();
     }
-
+    public boolean isReady() {
+        return xtClient.get() != null;
+    }
     public XTablesClient getXtClient() {
         return xtClient.get();
     }

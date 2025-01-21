@@ -71,7 +71,8 @@ public class NTDataPublisher implements CVPipelineResultConsumer {
 
         // ignore indexes below 0
         if (newIndex < 0) {
-            XTablesManager.getInstance().getXtClient().putInteger(cameraNickname + "pipelineIndexState", originalIndex);
+            if (XTablesManager.getInstance().isReady())
+                XTablesManager.getInstance().getXtClient().putInteger(cameraNickname + "pipelineIndexState", originalIndex);
             return;
         }
 
@@ -83,7 +84,8 @@ public class NTDataPublisher implements CVPipelineResultConsumer {
         pipelineIndexConsumer.accept(newIndex);
         var setIndex = pipelineIndexSupplier.get();
         if (newIndex != setIndex) { // set failed
-            XTablesManager.getInstance().getXtClient().putInteger(cameraNickname + "pipelineIndexState", setIndex);
+            if (XTablesManager.getInstance().isReady())
+                XTablesManager.getInstance().getXtClient().putInteger(cameraNickname + "pipelineIndexState", setIndex);
             // TODO: Log
         }
         logger.debug("Set pipeline index to " + newIndex);
@@ -154,35 +156,50 @@ public class NTDataPublisher implements CVPipelineResultConsumer {
 
         // random guess at size of the array
 
-        XTablesManager.getInstance().getXtClient().putInteger(cameraNickname + "pipelineIndexState", pipelineIndexSupplier.get());
-        XTablesManager.getInstance().getXtClient().putDouble(cameraNickname + "latencyMillis", acceptedResult.getLatencyMillis());
-        XTablesManager.getInstance().getXtClient().putBoolean(cameraNickname + "pipelineIndexState", acceptedResult.hasTargets());
+        if (XTablesManager.getInstance().isReady())
+            XTablesManager.getInstance().getXtClient().putInteger(cameraNickname + "pipelineIndexState", pipelineIndexSupplier.get());
+        if (XTablesManager.getInstance().isReady())
+            XTablesManager.getInstance().getXtClient().putDouble(cameraNickname + "latencyMillis", acceptedResult.getLatencyMillis());
+        if (XTablesManager.getInstance().isReady())
+            XTablesManager.getInstance().getXtClient().putBoolean(cameraNickname + "pipelineIndexState", acceptedResult.hasTargets());
 
         if (acceptedResult.hasTargets()) {
             var bestTarget = acceptedResult.targets.get(0);
-            XTablesManager.getInstance().getXtClient().putDouble(cameraNickname + "targetPitch", bestTarget.getPitch());
-            XTablesManager.getInstance().getXtClient().putDouble(cameraNickname + "targetYaw", bestTarget.getYaw());
-            XTablesManager.getInstance().getXtClient().putDouble(cameraNickname + "targetArea", bestTarget.getArea());
-            XTablesManager.getInstance().getXtClient().putDouble(cameraNickname + "targetSkew", bestTarget.getSkew());
+            if (XTablesManager.getInstance().isReady())
+                XTablesManager.getInstance().getXtClient().putDouble(cameraNickname + "targetPitch", bestTarget.getPitch());
+            if (XTablesManager.getInstance().isReady())
+                XTablesManager.getInstance().getXtClient().putDouble(cameraNickname + "targetYaw", bestTarget.getYaw());
+            if (XTablesManager.getInstance().isReady())
+                XTablesManager.getInstance().getXtClient().putDouble(cameraNickname + "targetArea", bestTarget.getArea());
+            if (XTablesManager.getInstance().isReady())
+                XTablesManager.getInstance().getXtClient().putDouble(cameraNickname + "targetSkew", bestTarget.getSkew());
 
 
             var pose = bestTarget.getBestCameraToTarget3d();
             //ts.targetPoseEntry.set(pose);
 
             var targetOffsetPoint = bestTarget.getTargetOffsetPoint();
-            XTablesManager.getInstance().getXtClient().putDouble(cameraNickname + "targetPixelsX", targetOffsetPoint.x);
-            XTablesManager.getInstance().getXtClient().putDouble(cameraNickname + "targetPixelsY", targetOffsetPoint.y);
+            if (XTablesManager.getInstance().isReady())
+                XTablesManager.getInstance().getXtClient().putDouble(cameraNickname + "targetPixelsX", targetOffsetPoint.x);
+            if (XTablesManager.getInstance().isReady())
+                XTablesManager.getInstance().getXtClient().putDouble(cameraNickname + "targetPixelsY", targetOffsetPoint.y);
 
         } else {
-            XTablesManager.getInstance().getXtClient().putDouble(cameraNickname + "targetPitch", 0d);
-            XTablesManager.getInstance().getXtClient().putDouble(cameraNickname + "targetYaw", 0d);
-            XTablesManager.getInstance().getXtClient().putDouble(cameraNickname + "targetArea", 0d);
-            XTablesManager.getInstance().getXtClient().putDouble(cameraNickname + "targetSkew", 0d);
+            if (XTablesManager.getInstance().isReady())
+                XTablesManager.getInstance().getXtClient().putDouble(cameraNickname + "targetPitch", 0d);
+            if (XTablesManager.getInstance().isReady())
+                XTablesManager.getInstance().getXtClient().putDouble(cameraNickname + "targetYaw", 0d);
+            if (XTablesManager.getInstance().isReady())
+                XTablesManager.getInstance().getXtClient().putDouble(cameraNickname + "targetArea", 0d);
+            if (XTablesManager.getInstance().isReady())
+                XTablesManager.getInstance().getXtClient().putDouble(cameraNickname + "targetSkew", 0d);
 
 
             //ts.targetPoseEntry.set(new Transform3d());
-            XTablesManager.getInstance().getXtClient().putDouble(cameraNickname + "targetPixelsX", 0d);
-            XTablesManager.getInstance().getXtClient().putDouble(cameraNickname + "targetPixelsY", 0d);
+            if (XTablesManager.getInstance().isReady())
+                XTablesManager.getInstance().getXtClient().putDouble(cameraNickname + "targetPixelsX", 0d);
+            if (XTablesManager.getInstance().isReady())
+                XTablesManager.getInstance().getXtClient().putDouble(cameraNickname + "targetPixelsY", 0d);
 
         }
 
@@ -191,18 +208,23 @@ public class NTDataPublisher implements CVPipelineResultConsumer {
                 && acceptedResult.inputAndOutputFrame.frameStaticProperties != null
                 && acceptedResult.inputAndOutputFrame.frameStaticProperties.cameraCalibration != null) {
             var fsp = acceptedResult.inputAndOutputFrame.frameStaticProperties;
-            XTablesManager.getInstance().getXtClient().putList(cameraNickname + "cameraIntrinsics", Arrays.stream(fsp.cameraCalibration.getIntrinsicsArr())
-                    .boxed()
-                    .toArray(Double[]::new));
-            XTablesManager.getInstance().getXtClient().putList(cameraNickname + "cameraDistortion", Arrays.stream(fsp.cameraCalibration.getDistCoeffsArr())
-                    .boxed()
-                    .toArray(Double[]::new));
+            if (XTablesManager.getInstance().isReady())
+                XTablesManager.getInstance().getXtClient().putList(cameraNickname + "cameraIntrinsics", Arrays.stream(fsp.cameraCalibration.getIntrinsicsArr())
+                        .boxed()
+                        .toArray(Double[]::new));
+            if (XTablesManager.getInstance().isReady())
+                XTablesManager.getInstance().getXtClient().putList(cameraNickname + "cameraDistortion", Arrays.stream(fsp.cameraCalibration.getDistCoeffsArr())
+                        .boxed()
+                        .toArray(Double[]::new));
         } else {
-            XTablesManager.getInstance().getXtClient().putList(cameraNickname + "cameraIntrinsics", new Double[]{});
-            XTablesManager.getInstance().getXtClient().putList(cameraNickname + "cameraDistortion", new Double[]{});
+            if (XTablesManager.getInstance().isReady())
+                XTablesManager.getInstance().getXtClient().putList(cameraNickname + "cameraIntrinsics", new Double[]{});
+            if (XTablesManager.getInstance().isReady())
+                XTablesManager.getInstance().getXtClient().putList(cameraNickname + "cameraDistortion", new Double[]{});
 
         }
-        XTablesManager.getInstance().getXtClient().putLong(cameraNickname + "heartbeat", acceptedResult.sequenceID);
+        if (XTablesManager.getInstance().isReady())
+            XTablesManager.getInstance().getXtClient().putLong(cameraNickname + "heartbeat", acceptedResult.sequenceID);
 
         // TODO...nt4... is this needed?
         rootTable.getInstance().flush();

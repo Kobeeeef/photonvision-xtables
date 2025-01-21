@@ -50,10 +50,10 @@ public class MJPGFrameConsumer implements AutoCloseable {
                         event -> {
                             if (event.kind == VideoEvent.Kind.kNetworkInterfacesChanged) {
                                 try {
-                                    XTablesManager.getInstance().getXtClient().putString(XTablesManager.ROOT_NAME + "source", "cv:");
-                                    XTablesManager.getInstance().getXtClient().putBoolean(XTablesManager.ROOT_NAME + "connected", true);
-                                    XTablesManager.getInstance().getXtClient().putString(XTablesManager.ROOT_NAME + "mode", videoModeToString(cvSource.getVideoMode()));
-                                    XTablesManager.getInstance().getXtClient().putList(XTablesManager.ROOT_NAME + "modes", getSourceModeValues(cvSource.getHandle()));
+                                    if(XTablesManager.getInstance().isReady()) XTablesManager.getInstance().getXtClient().putString(XTablesManager.ROOT_NAME + "source", "cv:");
+                                    if(XTablesManager.getInstance().isReady()) XTablesManager.getInstance().getXtClient().putBoolean(XTablesManager.ROOT_NAME + "connected", true);
+                                    if(XTablesManager.getInstance().isReady()) XTablesManager.getInstance().getXtClient().putString(XTablesManager.ROOT_NAME + "mode", videoModeToString(cvSource.getVideoMode()));
+                                    if(XTablesManager.getInstance().isReady()) XTablesManager.getInstance().getXtClient().putList(XTablesManager.ROOT_NAME + "modes", getSourceModeValues(cvSource.getHandle()));
                                     updateStreamValues();
                                 }catch (Exception e) {
                                     e.printStackTrace();
@@ -88,7 +88,7 @@ public class MJPGFrameConsumer implements AutoCloseable {
 
         String[] streamAddresses = values.toArray(new String[0]);
         try {
-            XTablesManager.getInstance().getXtClient().putList(XTablesManager.ROOT_NAME + "streams", streamAddresses);
+            if(XTablesManager.getInstance().isReady()) XTablesManager.getInstance().getXtClient().putList(XTablesManager.ROOT_NAME + "streams", streamAddresses);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -154,7 +154,7 @@ public class MJPGFrameConsumer implements AutoCloseable {
     @Override
     public void close() {
         try {
-            XTablesManager.getInstance().getXtClient().putBoolean(XTablesManager.ROOT_NAME + "connected", false);
+            if(XTablesManager.getInstance().isReady()) XTablesManager.getInstance().getXtClient().putBoolean(XTablesManager.ROOT_NAME + "connected", false);
         } catch (Exception e) {
             e.printStackTrace();
         }

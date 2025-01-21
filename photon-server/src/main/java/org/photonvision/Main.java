@@ -286,7 +286,7 @@ public class Main {
 
         logger.info("Loading XTABLES...");
         XTablesManager.getInstance();
-        XTablesManager.getInstance().getXtClient().addVersionProperty("PHOTON-VISION");
+        if(XTablesManager.getInstance().isReady()) XTablesManager.getInstance().getXtClient().addVersionProperty("PHOTON-VISION");
 
 
         if (isSmoketest) {

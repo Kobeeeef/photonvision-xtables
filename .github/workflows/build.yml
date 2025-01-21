@@ -101,10 +101,6 @@ jobs:
       matrix:
         include:
           - os: ubuntu-22.04
-            artifact-name: Linux
-            architecture: x64
-            arch-override: linuxx64
-          - os: ubuntu-22.04
             artifact-name: LinuxArm64
             architecture: x64
             arch-override: linuxarm64

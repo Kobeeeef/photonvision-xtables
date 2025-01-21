@@ -174,7 +174,7 @@ jobs:
           path: build/outputs
 
   build-package:
-    needs: [build-client, build-gradle, build-offline-docs]
+    needs: [build-client, build-gradle]
 
     strategy:
       fail-fast: false

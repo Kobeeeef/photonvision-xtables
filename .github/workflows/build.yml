@@ -34,6 +34,32 @@ jobs:
         with:
           name: built-client
           path: photon-client/dist/
+  build-offline-docs:
+    name: "Build Offline Docs"
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install graphviz
+        run: |
+          sudo apt-get update
+          sudo apt-get -y install graphviz
+      - name: Install dependencies
+        working-directory: docs
+        run: |
+          python -m pip install --upgrade pip
+          pip install sphinx sphinx_rtd_theme sphinx-tabs sphinxext-opengraph doc8
+          pip install -r requirements.txt
+      - name: Build the docs
+        working-directory: docs
+        run: |
+          make html
+      - uses: actions/upload-artifact@v4
+        with:
+          name: built-docs
+          path: docs/build/html
   build-gradle:
     name: "Gradle Build"
     runs-on: ubuntu-22.04
@@ -68,7 +94,7 @@ jobs:
           file: ./photon-core/build/reports/jacoco/test/jacocoTestReport.xml
 
   build-package:
-    needs: [build-client, build-gradle]
+    needs: [build-client, build-gradle, build-offline-docs]
 
     strategy:
       fail-fast: false

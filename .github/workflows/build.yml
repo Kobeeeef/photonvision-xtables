@@ -35,42 +35,6 @@ jobs:
         with:
           name: built-client
           path: photon-client/dist/
-  build-examples:
-
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - os: macos-14
-            architecture: aarch64
-          - os: ubuntu-22.04
-
-    name: "Photonlib - Build Examples - ${{ matrix.os }}"
-    runs-on: ${{ matrix.os }}
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-      - name: Fetch tags
-        run: git fetch --tags --force
-      - name: Install Java 17
-        uses: actions/setup-java@v4
-        with:
-          java-version: 17
-          distribution: temurin
-      - name: Install RoboRIO Toolchain
-        run: ./gradlew installRoboRioToolchain
-      # Need to publish to maven local first, so that C++ sim can pick it up
-      - name: Publish photonlib to maven local
-        run: ./gradlew photon-targeting:publishtomavenlocal photon-lib:publishtomavenlocal -x check
-      - name: Build Java examples
-        working-directory: photonlib-java-examples
-        run: ./gradlew build
-      - name: Build C++ examples
-        working-directory: photonlib-cpp-examples
-        run: ./gradlew build
   build-gradle:
     name: "Gradle Build"
     runs-on: ubuntu-22.04
@@ -103,75 +67,6 @@ jobs:
         uses: codecov/codecov-action@v4
         with:
           file: ./photon-core/build/reports/jacoco/test/jacocoTestReport.xml
-
-  build-photonlib-vendorjson:
-    name: "Build Vendor JSON"
-    runs-on: ubuntu-22.04
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
-      - name: Install Java 17
-        uses: actions/setup-java@v4
-        with:
-          java-version: 17
-          distribution: temurin
-
-      # grab all tags
-      - run: git fetch --tags --force
-
-      # Generate the JSON and give it the ""standard""" name maven gives it
-      - run: |
-          ./gradlew photon-lib:generateVendorJson
-          export VERSION=$(git describe --tags --match=v*)
-          mv photon-lib/build/generated/vendordeps/photonlib.json photon-lib/build/generated/vendordeps/photonlib-$(git describe --tags --match=v*).json
-
-      # Upload it here so it shows up in releases
-      - uses: actions/upload-artifact@v4
-        with:
-          name: photonlib-vendor-json
-          path: photon-lib/build/generated/vendordeps/photonlib-*.json
-
-  build-photonlib-host:
-    env:
-      MACOSX_DEPLOYMENT_TARGET: 13
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - os: macos-14
-            artifact-name: macOS
-            architecture: aarch64
-          - os: ubuntu-22.04
-            artifact-name: Linux
-
-    name: "Photonlib - Build Host - ${{ matrix.artifact-name }}"
-    runs-on: ${{ matrix.os }}
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-      - name: Install Java 17
-        uses: actions/setup-java@v4
-        with:
-          java-version: 17
-          distribution: temurin
-          architecture: ${{ matrix.architecture }}
-      - run: git fetch --tags --force
-      - run: ./gradlew photon-targeting:build photon-lib:build -i
-        name: Build with Gradle
-      - run: ./gradlew photon-lib:publish photon-targeting:publish
-        name: Publish
-        env:
-          ARTIFACTORY_API_KEY: ${{ secrets.ARTIFACTORY_API_KEY }}
-        if: github.event_name == 'push' && github.repository_owner == 'photonvision'
-      # Copy artifacts to build/outputs/maven
-      - run: ./gradlew photon-lib:publish photon-targeting:publish -PcopyOfflineArtifacts
-      - uses: actions/upload-artifact@v4
-        with:
-          name: maven-${{ matrix.artifact-name }}
-          path: build/outputs
 
   build-package:
     needs: [build-client, build-gradle]

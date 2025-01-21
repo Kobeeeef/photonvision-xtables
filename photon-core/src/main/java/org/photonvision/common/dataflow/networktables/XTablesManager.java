@@ -1,6 +1,6 @@
 package org.photonvision.common.dataflow.networktables;
 
-import org.kobe.xbot.JClient.XTablesClient;
+import org.kobe.xbot.JClient.ConcurrentXTablesClient;
 import org.photonvision.common.dataflow.DataChangeService;
 import org.photonvision.common.dataflow.events.OutgoingUIEvent;
 import org.photonvision.common.logging.LogGroup;
@@ -13,20 +13,21 @@ import java.util.concurrent.atomic.AtomicReference;
 public class XTablesManager {
     private static final Logger logger = new Logger(XTablesManager.class, LogGroup.NetworkTables);
 
-    private final AtomicReference<XTablesClient> xtClient = new AtomicReference<>();
+    private final AtomicReference<ConcurrentXTablesClient> xtClient = new AtomicReference<>();
     private static XTablesManager INSTANCE;
     public static final String ROOT_NAME = "photonvision.";
     private XTablesManager() {
         new Thread(() -> {
         logger.info("Initializing XTablesManager");
-        xtClient.set(new XTablesClient());
+
+        xtClient.set(new ConcurrentXTablesClient());
         logger.info("XTablesManager initialized");
         }).start();
     }
     public boolean isReady() {
         return xtClient.get() != null;
     }
-    public XTablesClient getXtClient() {
+    public ConcurrentXTablesClient getXtClient() {
         return xtClient.get();
     }
 

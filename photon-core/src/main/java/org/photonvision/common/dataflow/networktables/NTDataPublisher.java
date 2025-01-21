@@ -17,6 +17,7 @@
 
 package org.photonvision.common.dataflow.networktables;
 
+import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEvent;
 import edu.wpi.first.networktables.NetworkTablesJNI;
@@ -56,12 +57,12 @@ public class NTDataPublisher implements CVPipelineResultConsumer {
             BooleanSupplier driverModeSupplier,
             Consumer<Boolean> driverModeConsumer)
     {
+        updateCameraNickname(cameraNickname);
         this.pipelineIndexSupplier = pipelineIndexSupplier;
         this.pipelineIndexConsumer = pipelineIndexConsumer;
         this.driverModeSupplier = driverModeSupplier;
         this.driverModeConsumer = driverModeConsumer;
 
-        updateCameraNickname(cameraNickname);
         updateEntries();
     }
 
@@ -161,7 +162,7 @@ public class NTDataPublisher implements CVPipelineResultConsumer {
         if (XTablesManager.getInstance().isReady())
             XTablesManager.getInstance().getXtClient().putDouble(cameraNickname + "latencyMillis", acceptedResult.getLatencyMillis());
         if (XTablesManager.getInstance().isReady())
-            XTablesManager.getInstance().getXtClient().putBoolean(cameraNickname + "pipelineIndexState", acceptedResult.hasTargets());
+            XTablesManager.getInstance().getXtClient().putBoolean(cameraNickname + "hasTarget", acceptedResult.hasTargets());
 
         if (acceptedResult.hasTargets()) {
             var bestTarget = acceptedResult.targets.get(0);
@@ -176,7 +177,21 @@ public class NTDataPublisher implements CVPipelineResultConsumer {
 
 
             var pose = bestTarget.getBestCameraToTarget3d();
-            //ts.targetPoseEntry.set(pose);
+            double x = pose.getTranslation().getX();
+            double y = pose.getTranslation().getY();
+            double z = pose.getTranslation().getZ();
+
+// Extract rotation as a quaternion (qw, qx, qy, qz)
+            Rotation3d rotation = pose.getRotation();
+            double qw = rotation.getQuaternion().getW();
+            double qx = rotation.getQuaternion().getX();
+            double qy = rotation.getQuaternion().getY();
+            double qz = rotation.getQuaternion().getZ();
+
+// Convert to Double[]
+            Double[] targetPoseArray = new Double[] {x, y, z, qw, qx, qy, qz};
+            if (XTablesManager.getInstance().isReady())
+                XTablesManager.getInstance().getXtClient().putList(cameraNickname + "targetPose", targetPoseArray);
 
             var targetOffsetPoint = bestTarget.getTargetOffsetPoint();
             if (XTablesManager.getInstance().isReady())
@@ -194,8 +209,8 @@ public class NTDataPublisher implements CVPipelineResultConsumer {
             if (XTablesManager.getInstance().isReady())
                 XTablesManager.getInstance().getXtClient().putDouble(cameraNickname + "targetSkew", 0d);
 
-
-            //ts.targetPoseEntry.set(new Transform3d());
+            if (XTablesManager.getInstance().isReady())
+                XTablesManager.getInstance().getXtClient().putList(cameraNickname + "targetPose", new Double[] {0d, 0d, 0d, 0d, 0d});
             if (XTablesManager.getInstance().isReady())
                 XTablesManager.getInstance().getXtClient().putDouble(cameraNickname + "targetPixelsX", 0d);
             if (XTablesManager.getInstance().isReady())
@@ -226,7 +241,5 @@ public class NTDataPublisher implements CVPipelineResultConsumer {
         if (XTablesManager.getInstance().isReady())
             XTablesManager.getInstance().getXtClient().putLong(cameraNickname + "heartbeat", acceptedResult.sequenceID);
 
-        // TODO...nt4... is this needed?
-        rootTable.getInstance().flush();
     }
 }

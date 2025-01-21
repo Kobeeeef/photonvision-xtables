@@ -6,6 +6,9 @@ apply plugin: "application"
 apply from: "${rootDir}/shared/common.gradle"
 
 dependencies {
+
+    implementation "org.kobe.xbot:xtables:4.6.4"
+
     implementation project(':photon-core')
 
     // Zip

@@ -236,7 +236,9 @@ def nativeConfig = configurations.create(nativeConfigName)
 def nativeTasks = wpilibTools.createExtractionTasks {
     configurationName = nativeConfigName
 }
-
+dependencies {
+    implementation "org.kobe.xbot:xtables:4.6.4"
+}
 nativeTasks.addToSourceSetResources(sourceSets.test)
 
 nativeConfig.dependencies.add wpilibTools.deps.wpilib("wpiutil")

@@ -26,6 +26,7 @@ import org.apache.commons.cli.*;
 import org.photonvision.common.configuration.CameraConfiguration;
 import org.photonvision.common.configuration.ConfigManager;
 import org.photonvision.common.configuration.NeuralNetworkModelManager;
+import org.photonvision.common.dataflow.networktables.NetworkTablesManager;
 import org.photonvision.common.dataflow.networktables.XTablesManager;
 import org.photonvision.common.hardware.HardwareManager;
 import org.photonvision.common.hardware.OsImageVersion;
@@ -278,7 +279,10 @@ public class Main {
 
         logger.debug("Loading NetworkManager...");
         NetworkManager.getInstance().reinitialize();
-
+        logger.debug("Loading NetworkTablesManager...");
+        NetworkTablesManager.getInstance()
+                .setConfig(ConfigManager.getInstance().getConfig().getNetworkConfig());
+        NetworkTablesManager.getInstance().registerTimedTasks();
 
         logger.info("Loading XTABLES...");
         XTablesManager.getInstance();

@@ -35,7 +35,7 @@ public class TimeSyncManager {
     private TimeSyncClient m_client = null;
     private TimeSyncServer m_server = null;
 
-
+    private NetworkTableInstance ntInstance;
     IntegerPublisher m_offsetPub;
     IntegerPublisher m_rtt2Pub;
     IntegerPublisher m_pingsPub;
@@ -47,6 +47,7 @@ public class TimeSyncManager {
             logger.error("PhotonTargetingJNI was not loaded! Cannot do time-sync");
         }
 
+        this.ntInstance = kRootTable.getInstance();
 
         // Need this subtable to be unique per coprocessor. TODO: consider using MAC address or
         // something similar for metrics?
@@ -108,19 +109,19 @@ public class TimeSyncManager {
             m_server = new TimeSyncServer(5810);
             m_server.start();
         } else
-        // if not already running a client, set it up
-        if (m_client == null) {
-            // tear down anything old
-            if (m_server != null) {
-                logger.debug("Tearing down old server");
-                m_server.stop();
-                m_server = null;
-            }
+            // if not already running a client, set it up
+            if (m_client == null) {
+                // tear down anything old
+                if (m_server != null) {
+                    logger.debug("Tearing down old server");
+                    m_server.stop();
+                    m_server = null;
+                }
 
-            // Guess at IP -- tick will take care of changing this (may take up to 1 second)
-            logger.debug("Starting TimeSyncClient on localhost (for now)");
-            m_client = new TimeSyncClient("127.0.0.1", 5810, 1.0);
-        }
+                // Guess at IP -- tick will take care of changing this (may take up to 1 second)
+                logger.debug("Starting TimeSyncClient on localhost (for now)");
+                m_client = new TimeSyncClient("127.0.0.1", 5810, 1.0);
+            }
     }
 
     synchronized void tick() {

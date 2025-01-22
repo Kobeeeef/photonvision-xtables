@@ -51,13 +51,16 @@ public class NTDataPublisher implements CVPipelineResultConsumer {
     private String cameraNickname;
 
     public NTDataPublisher(
-            String cameraNickname,
+            String cameraNicknameInst,
             Supplier<Integer> pipelineIndexSupplier,
             Consumer<Integer> pipelineIndexConsumer,
             BooleanSupplier driverModeSupplier,
             Consumer<Boolean> driverModeConsumer)
     {
-        updateCameraNickname(cameraNickname);
+        this.cameraNickname = XTablesManager.ROOT_NAME + cameraNicknameInst + ".";
+        System.out.println("HERE CALL: " + cameraNicknameInst);
+        System.out.println("HERE CAALL: " + this.cameraNickname);
+        updateCameraNickname(cameraNicknameInst);
         this.pipelineIndexSupplier = pipelineIndexSupplier;
         this.pipelineIndexConsumer = pipelineIndexConsumer;
         this.driverModeSupplier = driverModeSupplier;

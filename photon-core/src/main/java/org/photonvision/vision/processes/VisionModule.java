@@ -138,10 +138,11 @@ public class VisionModule {
         createStreams();
 
         recreateStreamResultConsumers();
-
+        System.out.println("CAMERA" + visionSource.getSettables().getConfiguration().nickname);
+        System.out.println("CAMERA" + visionSource.getSettables().getConfiguration().uniqueName);
         ntConsumer =
                 new NTDataPublisher(
-                        visionSource.getSettables().getConfiguration().nickname == null ? visionSource.getSettables().getConfiguration().uniqueName : visionSource.getSettables().getConfiguration().nickname,
+                        visionSource.getSettables().getConfiguration().nickname == null ? visionSource.getSettables().getConfiguration().uniqueName == null ? "unknownname?" : visionSource.getSettables().getConfiguration().uniqueName : visionSource.getSettables().getConfiguration().nickname,
                         pipelineManager::getRequestedIndex,
                         this::setPipeline,
                         pipelineManager::getDriverMode,

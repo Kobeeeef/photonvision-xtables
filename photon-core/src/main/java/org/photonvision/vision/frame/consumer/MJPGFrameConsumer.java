@@ -50,10 +50,10 @@ public class MJPGFrameConsumer implements AutoCloseable {
                         event -> {
                             if (event.kind == VideoEvent.Kind.kNetworkInterfacesChanged) {
                                 try {
-                                    if(XTablesManager.getInstance().isReady()) XTablesManager.getInstance().getXtClient().putString(XTablesManager.ROOT_NAME + "source", "cv:");
-                                    if(XTablesManager.getInstance().isReady()) XTablesManager.getInstance().getXtClient().putBoolean(XTablesManager.ROOT_NAME + "connected", true);
-                                    if(XTablesManager.getInstance().isReady()) XTablesManager.getInstance().getXtClient().putString(XTablesManager.ROOT_NAME + "mode", videoModeToString(cvSource.getVideoMode()));
-                                    if(XTablesManager.getInstance().isReady()) XTablesManager.getInstance().getXtClient().putList(XTablesManager.ROOT_NAME + "modes", getSourceModeValues(cvSource.getHandle()));
+                                    if(XTablesManager.getInstance().isReady()) XTablesManager.getInstance().getXtClient().putString(XTablesManager.ROOT_NAME + this.key + "source", "cv:");
+                                    if(XTablesManager.getInstance().isReady()) XTablesManager.getInstance().getXtClient().putBoolean(XTablesManager.ROOT_NAME + this.key + "connected", true);
+                                    if(XTablesManager.getInstance().isReady()) XTablesManager.getInstance().getXtClient().putString(XTablesManager.ROOT_NAME + this.key + "mode", videoModeToString(cvSource.getVideoMode()));
+                                    if(XTablesManager.getInstance().isReady()) XTablesManager.getInstance().getXtClient().putList(XTablesManager.ROOT_NAME + this.key + "modes", getSourceModeValues(cvSource.getHandle()));
                                     updateStreamValues();
                                 }catch (Exception e) {
                                     e.printStackTrace();
@@ -154,7 +154,7 @@ public class MJPGFrameConsumer implements AutoCloseable {
     @Override
     public void close() {
         try {
-            if(XTablesManager.getInstance().isReady()) XTablesManager.getInstance().getXtClient().putBoolean(XTablesManager.ROOT_NAME + "connected", false);
+            if(XTablesManager.getInstance().isReady()) XTablesManager.getInstance().getXtClient().putBoolean(XTablesManager.ROOT_NAME + this.key + "connected", false);
         } catch (Exception e) {
             e.printStackTrace();
         }

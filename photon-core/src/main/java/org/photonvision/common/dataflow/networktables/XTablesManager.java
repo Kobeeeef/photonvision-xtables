@@ -21,6 +21,7 @@ public class XTablesManager {
         logger.info("Initializing XTablesManager");
 
         xtClient.set(new ConcurrentXTablesClient());
+        xtClient.get().addVersionProperty("PHOTON-VISION");
         logger.info("XTablesManager initialized");
         }).start();
     }

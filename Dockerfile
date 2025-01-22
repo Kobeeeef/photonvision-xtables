@@ -49,8 +49,11 @@ ENV PATH="$JAVA_HOME/bin:$PATH"
 # Set working directory
 WORKDIR /workspace
 
-# Copy project files (adjust if necessary)
+# Copy project files
 COPY . /workspace
+
+# Ensure Gradlew is executable
+RUN chmod +x /workspace/gradlew
 
 # Install Node.js dependencies
 RUN cd photon-client && npm ci
@@ -66,10 +69,10 @@ RUN cd photon-client && npm run build
 RUN cd docs && make html
 
 # Install Arm64 toolchain
-RUN ./gradlew installArm64Toolchain
+RUN cd /workspace && ./gradlew installArm64Toolchain
 
 # Build LinuxArm64 JAR
-RUN ./gradlew photon-server:shadowJar -PArchOverride=linuxarm64
+RUN cd /workspace && ./gradlew photon-server:shadowJar -PArchOverride=linuxarm64
 
 # Set up a volume for the output JAR files
 VOLUME ["/output"]

@@ -88,7 +88,7 @@ public class MJPGFrameConsumer implements AutoCloseable {
 
         String[] streamAddresses = values.toArray(new String[0]);
         try {
-            if(XTablesManager.getInstance().isReady()) XTablesManager.getInstance().getXtClient().putList(XTablesManager.ROOT_NAME + "streams", streamAddresses);
+            if(XTablesManager.getInstance().isReady()) XTablesManager.getInstance().getXtClient().putList(XTablesManager.ROOT_NAME + this.key + "streams", streamAddresses);
         } catch (Exception e) {
             e.printStackTrace();
         }

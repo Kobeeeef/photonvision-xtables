@@ -220,6 +220,7 @@ public class NTDataPublisher implements CVPipelineResultConsumer {
         }
 
         batchedPushRequests.putLong(cameraNickname + "heartbeat", acceptedResult.sequenceID);
-        XTablesManager.getInstance().getXtClient().sendBatchedPushRequests(batchedPushRequests);
+        if (XTablesManager.getInstance().isReady())
+            XTablesManager.getInstance().getXtClient().sendBatchedPushRequests(batchedPushRequests);
     }
 }

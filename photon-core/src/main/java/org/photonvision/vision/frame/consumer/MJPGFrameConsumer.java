@@ -20,6 +20,7 @@ package org.photonvision.vision.frame.consumer;
 import edu.wpi.first.cscore.*;
 import edu.wpi.first.util.PixelFormat;
 import java.util.ArrayList;
+import java.util.List;
 
 import org.photonvision.common.dataflow.networktables.XTablesManager;
 import org.photonvision.common.util.math.MathUtils;
@@ -53,7 +54,7 @@ public class MJPGFrameConsumer implements AutoCloseable {
                                     if(XTablesManager.getInstance().isReady()) XTablesManager.getInstance().getXtClient().putString(XTablesManager.ROOT_NAME + this.key + "source", "cv:");
                                     if(XTablesManager.getInstance().isReady()) XTablesManager.getInstance().getXtClient().putBoolean(XTablesManager.ROOT_NAME + this.key + "connected", true);
                                     if(XTablesManager.getInstance().isReady()) XTablesManager.getInstance().getXtClient().putString(XTablesManager.ROOT_NAME + this.key + "mode", videoModeToString(cvSource.getVideoMode()));
-                                    if(XTablesManager.getInstance().isReady()) XTablesManager.getInstance().getXtClient().putList(XTablesManager.ROOT_NAME + this.key + "modes", getSourceModeValues(cvSource.getHandle()));
+                                    if(XTablesManager.getInstance().isReady()) XTablesManager.getInstance().getXtClient().putStringList(XTablesManager.ROOT_NAME + this.key + "modes", List.of(getSourceModeValues(cvSource.getHandle())));
                                     updateStreamValues();
                                 }catch (Exception e) {
                                     e.printStackTrace();
@@ -88,7 +89,7 @@ public class MJPGFrameConsumer implements AutoCloseable {
 
         String[] streamAddresses = values.toArray(new String[0]);
         try {
-            if(XTablesManager.getInstance().isReady()) XTablesManager.getInstance().getXtClient().putList(XTablesManager.ROOT_NAME + this.key + "streams", streamAddresses);
+            if(XTablesManager.getInstance().isReady()) XTablesManager.getInstance().getXtClient().putStringList(XTablesManager.ROOT_NAME + this.key + "streams", List.of(streamAddresses));
         } catch (Exception e) {
             e.printStackTrace();
         }

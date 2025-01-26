@@ -8,7 +8,7 @@ evaluationDependsOn ':photon-server'
 evaluationDependsOn ':photon-lib'
 
 dependencies {
-    implementation "org.kobe.xbot:xtables:4.6.6"
+    implementation "org.kobe.xbot:xtables:4.6.9"
 }
 def baseArtifactIdCpp = 'documentation'
 def artifactGroupIdCpp = 'org.photonvision.cppdocs'

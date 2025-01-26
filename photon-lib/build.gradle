@@ -19,7 +19,7 @@ apply from: "${rootDir}/shared/javacommon.gradle"
 
 apply from: "${rootDir}/versioningHelper.gradle"
 dependencies {
-    implementation "org.kobe.xbot:xtables:4.6.6"
+    implementation "org.kobe.xbot:xtables:4.6.9"
 }
 nativeUtils {
     exportsConfigs {

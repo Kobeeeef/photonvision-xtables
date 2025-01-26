@@ -237,7 +237,7 @@ def nativeTasks = wpilibTools.createExtractionTasks {
     configurationName = nativeConfigName
 }
 dependencies {
-    implementation "org.kobe.xbot:xtables:4.6.6"
+    implementation "org.kobe.xbot:xtables:4.6.9"
 }
 nativeTasks.addToSourceSetResources(sourceSets.test)
 

@@ -541,8 +541,8 @@ public class VisionModule {
     public void setCameraNickname(String newName) {
         visionSource.getSettables().getConfiguration().nickname = newName;
         ntConsumer.updateCameraNickname(newName);
-        inputFrameSaver.updateCameraNickname(newName);
-        outputFrameSaver.updateCameraNickname(newName);
+//        inputFrameSaver.updateCameraNickname(newName);
+//        outputFrameSaver.updateCameraNickname(newName);
 
         // Push new data to the UI
         saveAndBroadcastAll();

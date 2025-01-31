@@ -49,14 +49,14 @@ public class FileSaveFrameConsumer implements Consumer<CVMat> {
     DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
     DateFormat tf = new SimpleDateFormat("hhmmssSS");
 
-    private final NetworkTable rootTable;
-    private NetworkTable subTable;
-    private final String ntEntryName;
-    private IntegerEntry saveFrameEntry;
 
-    private StringSubscriber ntEventName;
-    private IntegerSubscriber ntMatchNum;
-    private IntegerSubscriber ntMatchType;
+//    private NetworkTable subTable;
+//    private final String ntEntryName;
+//    private IntegerEntry saveFrameEntry;
+//
+//    private StringSubscriber ntEventName;
+//    private IntegerSubscriber ntMatchNum;
+//    private IntegerSubscriber ntMatchType;
 
     private final String cameraUniqueName;
     private String cameraNickname;
@@ -65,29 +65,29 @@ public class FileSaveFrameConsumer implements Consumer<CVMat> {
     private long savedImagesCount = 0;
 
     public FileSaveFrameConsumer(String camNickname, String cameraUniqueName, String streamPrefix) {
-        this.ntEntryName = streamPrefix + NT_SUFFIX;
+//        this.ntEntryName = streamPrefix + NT_SUFFIX;
         this.cameraNickname = camNickname;
         this.cameraUniqueName = cameraUniqueName;
         this.streamType = streamPrefix;
 
-        this.rootTable = NetworkTablesManager.getInstance().kRootTable;
-
-        NetworkTable fmsTable = NetworkTablesManager.getInstance().getNTInst().getTable("FMSInfo");
-        this.ntEventName = fmsTable.getStringTopic("EventName").subscribe("UNKNOWN");
-        this.ntMatchNum = fmsTable.getIntegerTopic("MatchNumber").subscribe(-1);
-        this.ntMatchType = fmsTable.getIntegerTopic("MatchType").subscribe(0);
+//        this.rootTable = NetworkTablesManager.getInstance().kRootTable;
+//
+//        NetworkTable fmsTable = NetworkTablesManager.getInstance().getNTInst().getTable("FMSInfo");
+//        this.ntEventName = fmsTable.getStringTopic("EventName").subscribe("UNKNOWN");
+//        this.ntMatchNum = fmsTable.getIntegerTopic("MatchNumber").subscribe(-1);
+//        this.ntMatchType = fmsTable.getIntegerTopic("MatchType").subscribe(0);
 
         updateCameraNickname(camNickname);
     }
 
     public void accept(CVMat image) {
-        long currentCount = saveFrameEntry.get();
+//        long currentCount = saveFrameEntry.get();
 
         // Await save request
-        if (currentCount == -1) return;
+//        if (currentCount == -1) return;
 
         // The requested count is greater than the actual count
-        if (savedImagesCount < currentCount) {
+//        if (savedImagesCount < currentCount) {
             Date now = new Date();
 
             String fileName =
@@ -99,7 +99,7 @@ public class FileSaveFrameConsumer implements Consumer<CVMat> {
                             + "T"
                             + tf.format(now)
                             + "_"
-                            + getMatchData();
+                            + "THIS-WAS-REMOVED-KOBE";
 
             // Check if the Unique Camera directory exists and create it if it doesn't
             String cameraPath = FILE_PATH + File.separator + this.cameraUniqueName;
@@ -118,57 +118,57 @@ public class FileSaveFrameConsumer implements Consumer<CVMat> {
 
             savedImagesCount++;
             logger.info("Saved new image at " + saveFilePath);
-        } else if (savedImagesCount > currentCount) {
-            // Reset local value with NT value in case of de-sync
-            savedImagesCount = currentCount;
-        }
+//        } else if (savedImagesCount > currentCount) {
+//            // Reset local value with NT value in case of de-sync
+//            savedImagesCount = currentCount;
+//        }
     }
 
     public void updateCameraNickname(String newCameraNickname) {
         // Remove existing entries
-        if (this.subTable != null) {
-            if (this.subTable.containsKey(ntEntryName)) {
-                this.subTable.getEntry(ntEntryName).close();
-            }
-        }
+//        if (this.subTable != null) {
+//            if (this.subTable.containsKey(ntEntryName)) {
+//                this.subTable.getEntry(ntEntryName).close();
+//            }
+//        }
 
         // Recreate and re-init network tables structure
         this.cameraNickname = newCameraNickname;
-        this.subTable = rootTable.getSubTable(this.cameraNickname);
-        this.subTable.getEntry(ntEntryName).setInteger(savedImagesCount);
-        this.saveFrameEntry = subTable.getIntegerTopic(ntEntryName).getEntry(-1); // Default negative
+//        this.subTable = rootTable.getSubTable(this.cameraNickname);
+//        this.subTable.getEntry(ntEntryName).setInteger(savedImagesCount);
+//        this.saveFrameEntry = subTable.getIntegerTopic(ntEntryName).getEntry(-1); // Default negative
     }
-
-    public void overrideTakeSnapshot() {
-        // Simulate NT change
-        saveFrameEntry.set(saveFrameEntry.get() + 1);
-    }
+//
+//    public void overrideTakeSnapshot() {
+//        // Simulate NT change
+//        saveFrameEntry.set(saveFrameEntry.get() + 1);
+//    }
 
     /**
      * Returns the match Data collected from the NT. eg : Q58 for qualfication match 58. If not in
      * event, returns N/A-0-EVENTNAME
      */
-    private String getMatchData() {
-        var matchType = ntMatchType.getAtomic();
-        if (matchType.timestamp == 0) {
-            // no NT info yet
-            logger.warn("Did not receive match type, defaulting to 0");
-        }
-
-        var matchNum = ntMatchNum.getAtomic();
-        if (matchNum.timestamp == 0) {
-            logger.warn("Did not receive match num, defaulting to -1");
-        }
-
-        var eventName = ntEventName.getAtomic();
-        if (eventName.timestamp == 0) {
-            logger.warn("Did not receive event name, defaulting to 'UNKNOWN'");
-        }
-
-        String matchTypeStr =
-                matchTypes[MathUtil.clamp((int) matchType.value, 0, matchTypes.length - 1)];
-        return matchTypeStr + "-" + matchNum.value + "-" + eventName.value;
-    }
+//    private String getMatchData() {
+//        var matchType = ntMatchType.getAtomic();
+//        if (matchType.timestamp == 0) {
+//            // no NT info yet
+//            logger.warn("Did not receive match type, defaulting to 0");
+//        }
+//
+//        var matchNum = ntMatchNum.getAtomic();
+//        if (matchNum.timestamp == 0) {
+//            logger.warn("Did not receive match num, defaulting to -1");
+//        }
+//
+//        var eventName = ntEventName.getAtomic();
+//        if (eventName.timestamp == 0) {
+//            logger.warn("Did not receive event name, defaulting to 'UNKNOWN'");
+//        }
+//
+//        String matchTypeStr =
+//                matchTypes[MathUtil.clamp((int) matchType.value, 0, matchTypes.length - 1)];
+//        return matchTypeStr + "-" + matchNum.value + "-" + eventName.value;
+//    }
 
     public void close() {
         // troododfa;lkjadsf;lkfdsaj otgooadflsk;j

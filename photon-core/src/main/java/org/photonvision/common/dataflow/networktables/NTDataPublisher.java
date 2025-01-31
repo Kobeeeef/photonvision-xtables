@@ -21,6 +21,11 @@ import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEvent;
 import edu.wpi.first.networktables.NetworkTablesJNI;
+import java.util.Arrays;
+import java.util.List;
+import java.util.function.BooleanSupplier;
+import java.util.function.Consumer;
+import java.util.function.Supplier;
 import org.kobe.xbot.Utilities.Entities.BatchedPushRequests;
 import org.photonvision.common.dataflow.CVPipelineResultConsumer;
 import org.photonvision.common.logging.LogGroup;
@@ -30,12 +35,6 @@ import org.photonvision.targeting.PhotonPipelineResult;
 import org.photonvision.vision.pipeline.result.CVPipelineResult;
 import org.photonvision.vision.pipeline.result.CalibrationPipelineResult;
 import org.photonvision.vision.target.TrackedTarget;
-
-import java.util.Arrays;
-import java.util.List;
-import java.util.function.BooleanSupplier;
-import java.util.function.Consumer;
-import java.util.function.Supplier;
 
 public class NTDataPublisher implements CVPipelineResultConsumer {
     private final Logger logger = new Logger(NTDataPublisher.class, LogGroup.General);
@@ -56,8 +55,7 @@ public class NTDataPublisher implements CVPipelineResultConsumer {
             Supplier<Integer> pipelineIndexSupplier,
             Consumer<Integer> pipelineIndexConsumer,
             BooleanSupplier driverModeSupplier,
-            Consumer<Boolean> driverModeConsumer)
-    {
+            Consumer<Boolean> driverModeConsumer) {
         this.cameraNickname = XTablesManager.ROOT_NAME + cameraNicknameInst + ".";
 
         updateCameraNickname(cameraNicknameInst);
@@ -76,7 +74,9 @@ public class NTDataPublisher implements CVPipelineResultConsumer {
         // ignore indexes below 0
         if (newIndex < 0) {
             if (XTablesManager.getInstance().isReady())
-                XTablesManager.getInstance().getXtClient().putInteger(cameraNickname + "pipelineIndexState", originalIndex);
+                XTablesManager.getInstance()
+                        .getXtClient()
+                        .putInteger(cameraNickname + "pipelineIndexState", originalIndex);
             return;
         }
 
@@ -89,7 +89,9 @@ public class NTDataPublisher implements CVPipelineResultConsumer {
         var setIndex = pipelineIndexSupplier.get();
         if (newIndex != setIndex) { // set failed
             if (XTablesManager.getInstance().isReady())
-                XTablesManager.getInstance().getXtClient().putInteger(cameraNickname + "pipelineIndexState", setIndex);
+                XTablesManager.getInstance()
+                        .getXtClient()
+                        .putInteger(cameraNickname + "pipelineIndexState", setIndex);
             // TODO: Log
         }
         logger.debug("Set pipeline index to " + newIndex);
@@ -111,14 +113,11 @@ public class NTDataPublisher implements CVPipelineResultConsumer {
     private void removeEntries() {
         if (pipelineIndexListener != null) pipelineIndexListener.remove();
         if (driverModeListener != null) driverModeListener.remove();
-
     }
 
     private void updateEntries() {
         if (pipelineIndexListener != null) pipelineIndexListener.remove();
         if (driverModeListener != null) driverModeListener.remove();
-
-
     }
 
     public void updateCameraNickname(String newCameraNickname) {
@@ -159,8 +158,10 @@ public class NTDataPublisher implements CVPipelineResultConsumer {
 
         // random guess at size of the array
         BatchedPushRequests batchedPushRequests = new BatchedPushRequests();
-        batchedPushRequests.putInteger(cameraNickname + "pipelineIndexState", pipelineIndexSupplier.get());
-        batchedPushRequests.putDouble(cameraNickname + "latencyMillis", acceptedResult.getLatencyMillis());
+        batchedPushRequests.putInteger(
+                cameraNickname + "pipelineIndexState", pipelineIndexSupplier.get());
+        batchedPushRequests.putDouble(
+                cameraNickname + "latencyMillis", acceptedResult.getLatencyMillis());
         batchedPushRequests.putBoolean(cameraNickname + "hasTarget", acceptedResult.hasTargets());
 
         if (acceptedResult.hasTargets()) {
@@ -170,21 +171,20 @@ public class NTDataPublisher implements CVPipelineResultConsumer {
             batchedPushRequests.putDouble(cameraNickname + "targetArea", bestTarget.getArea());
             batchedPushRequests.putDouble(cameraNickname + "targetSkew", bestTarget.getSkew());
 
-
             var pose = bestTarget.getBestCameraToTarget3d();
             double x = pose.getTranslation().getX();
             double y = pose.getTranslation().getY();
             double z = pose.getTranslation().getZ();
 
-// Extract rotation as a quaternion (qw, qx, qy, qz)
+            // Extract rotation as a quaternion (qw, qx, qy, qz)
             Rotation3d rotation = pose.getRotation();
             double qw = rotation.getQuaternion().getW();
             double qx = rotation.getQuaternion().getX();
             double qy = rotation.getQuaternion().getY();
             double qz = rotation.getQuaternion().getZ();
 
-// Convert to Double[]
-            Double[] targetPoseArray = new Double[]{x, y, z, qw, qx, qy, qz};
+            // Convert to Double[]
+            Double[] targetPoseArray = new Double[] {x, y, z, qw, qx, qy, qz};
             batchedPushRequests.putDoubleList(cameraNickname + "targetPose", List.of(targetPoseArray));
 
             var targetOffsetPoint = bestTarget.getTargetOffsetPoint();
@@ -196,10 +196,10 @@ public class NTDataPublisher implements CVPipelineResultConsumer {
             batchedPushRequests.putDouble(cameraNickname + "targetYaw", 0d);
             batchedPushRequests.putDouble(cameraNickname + "targetArea", 0d);
             batchedPushRequests.putDouble(cameraNickname + "targetSkew", 0d);
-            batchedPushRequests.putDoubleList(cameraNickname + "targetPose", List.of(new Double[]{0d, 0d, 0d, 0d, 0d}));
+            batchedPushRequests.putDoubleList(
+                    cameraNickname + "targetPose", List.of(new Double[] {0d, 0d, 0d, 0d, 0d}));
             batchedPushRequests.putDouble(cameraNickname + "targetPixelsX", 0d);
             batchedPushRequests.putDouble(cameraNickname + "targetPixelsY", 0d);
-
         }
 
         // Something in the result can sometimes be null -- so check probably too many things
@@ -207,16 +207,23 @@ public class NTDataPublisher implements CVPipelineResultConsumer {
                 && acceptedResult.inputAndOutputFrame.frameStaticProperties != null
                 && acceptedResult.inputAndOutputFrame.frameStaticProperties.cameraCalibration != null) {
             var fsp = acceptedResult.inputAndOutputFrame.frameStaticProperties;
-            batchedPushRequests.putDoubleList(cameraNickname + "cameraIntrinsics", List.of(Arrays.stream(fsp.cameraCalibration.getIntrinsicsArr())
-                    .boxed()
-                    .toArray(Double[]::new)));
-            batchedPushRequests.putDoubleList(cameraNickname + "cameraDistortion", List.of(Arrays.stream(fsp.cameraCalibration.getDistCoeffsArr())
-                    .boxed()
-                    .toArray(Double[]::new)));
+            batchedPushRequests.putDoubleList(
+                    cameraNickname + "cameraIntrinsics",
+                    List.of(
+                            Arrays.stream(fsp.cameraCalibration.getIntrinsicsArr())
+                                    .boxed()
+                                    .toArray(Double[]::new)));
+            batchedPushRequests.putDoubleList(
+                    cameraNickname + "cameraDistortion",
+                    List.of(
+                            Arrays.stream(fsp.cameraCalibration.getDistCoeffsArr())
+                                    .boxed()
+                                    .toArray(Double[]::new)));
         } else {
-            batchedPushRequests.putDoubleList(cameraNickname + "cameraIntrinsics", List.of(new Double[]{}));
-            batchedPushRequests.putDoubleList(cameraNickname + "cameraDistortion", List.of(new Double[]{}));
-
+            batchedPushRequests.putDoubleList(
+                    cameraNickname + "cameraIntrinsics", List.of(new Double[] {}));
+            batchedPushRequests.putDoubleList(
+                    cameraNickname + "cameraDistortion", List.of(new Double[] {}));
         }
 
         batchedPushRequests.putLong(cameraNickname + "heartbeat", acceptedResult.sequenceID);

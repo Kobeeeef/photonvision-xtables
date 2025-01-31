@@ -68,6 +68,20 @@ task writeCurrentVersion {
                 versionString)
     }
 }
+tasks.register('runPhotonTest', JavaExec) {
+    group = "verification"
+    description = "Runs the PhotonVision test process"
+
+    classpath = sourceSets.test.runtimeClasspath
+    mainClass = "org.photonvision.vision.processes.test.main"
+
+    // Set JVM arguments if needed
+    jvmArgs = ["-Dfile.encoding=UTF-8"]
+
+    // Pass any arguments if required
+    args = []
+}
+
 // https://github.com/wpilibsuite/allwpilib/blob/main/wpilibj/build.gradle#L52
 sourceSets.main.java.srcDir "${buildDir}/generated/java/"
 

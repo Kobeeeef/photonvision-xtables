@@ -21,6 +21,11 @@ import edu.wpi.first.cscore.CameraServerJNI;
 import edu.wpi.first.cscore.VideoException;
 import edu.wpi.first.math.util.Units;
 import io.javalin.websocket.WsContext;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.function.BiConsumer;
 import org.opencv.core.Size;
 import org.photonvision.common.configuration.CameraConfiguration;
 import org.photonvision.common.configuration.ConfigManager;
@@ -52,12 +57,6 @@ import org.photonvision.vision.pipeline.UICalibrationData;
 import org.photonvision.vision.pipeline.result.CVPipelineResult;
 import org.photonvision.vision.target.TargetModel;
 import org.photonvision.vision.target.TrackedTarget;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.function.BiConsumer;
 
 /**
  * This is the God Class
@@ -140,7 +139,11 @@ public class VisionModule {
         recreateStreamResultConsumers();
         ntConsumer =
                 new NTDataPublisher(
-                        visionSource.getSettables().getConfiguration().nickname == null ? visionSource.getSettables().getConfiguration().uniqueName == null ? "unknownname?" : visionSource.getSettables().getConfiguration().uniqueName : visionSource.getSettables().getConfiguration().nickname,
+                        visionSource.getSettables().getConfiguration().nickname == null
+                                ? visionSource.getSettables().getConfiguration().uniqueName == null
+                                        ? "unknownname?"
+                                        : visionSource.getSettables().getConfiguration().uniqueName
+                                : visionSource.getSettables().getConfiguration().nickname,
                         pipelineManager::getRequestedIndex,
                         this::setPipeline,
                         pipelineManager::getDriverMode,
@@ -236,8 +239,7 @@ public class VisionModule {
         }
 
         public void updateData(
-                Frame inputOutputFrame, AdvancedPipelineSettings settings, List<TrackedTarget> targets)
-        {
+                Frame inputOutputFrame, AdvancedPipelineSettings settings, List<TrackedTarget> targets) {
             synchronized (frameLock) {
                 if (shouldRun && this.latestFrame != null) {
                     logger.trace("Fell behind; releasing last unused Mats");
@@ -581,8 +583,8 @@ public class VisionModule {
             internalMap.put(
                     "pixelFormat",
                     ((videoModes.get(k) instanceof LibcameraGpuSource.FPSRatedVideoMode)
-                            ? "kPicam"
-                            : videoModes.get(k).pixelFormat.toString())
+                                    ? "kPicam"
+                                    : videoModes.get(k).pixelFormat.toString())
                             .substring(1)); // Remove the k prefix
 
             temp.put(k, internalMap);
@@ -629,7 +631,7 @@ public class VisionModule {
         // Pipelines like DriverMode and Calibrate3dPipeline have null output frames
         if (result.inputAndOutputFrame != null
                 && (pipelineManager.getCurrentPipelineSettings()
-                instanceof AdvancedPipelineSettings settings)) {
+                        instanceof AdvancedPipelineSettings settings)) {
             streamRunnable.updateData(result.inputAndOutputFrame, settings, result.targets);
             // The streamRunnable manages releasing in this case
         } else {
@@ -646,9 +648,7 @@ public class VisionModule {
         }
     }
 
-    /**
-     * Consume stream/target results, no rate limiting applied
-     */
+    /** Consume stream/target results, no rate limiting applied */
     private void consumeResults(Frame frame, List<TrackedTarget> targets) {
         for (var c : streamResultConsumers) {
             c.accept(frame, targets);

@@ -21,7 +21,6 @@ import edu.wpi.first.cscore.*;
 import edu.wpi.first.util.PixelFormat;
 import java.util.ArrayList;
 import java.util.List;
-
 import org.photonvision.common.dataflow.networktables.XTablesManager;
 import org.photonvision.common.util.math.MathUtils;
 import org.photonvision.vision.frame.StaticFrames;
@@ -51,12 +50,28 @@ public class MJPGFrameConsumer implements AutoCloseable {
                         event -> {
                             if (event.kind == VideoEvent.Kind.kNetworkInterfacesChanged) {
                                 try {
-                                    if(XTablesManager.getInstance().isReady()) XTablesManager.getInstance().getXtClient().putString(XTablesManager.ROOT_NAME + this.key + "source", "cv:");
-                                    if(XTablesManager.getInstance().isReady()) XTablesManager.getInstance().getXtClient().putBoolean(XTablesManager.ROOT_NAME + this.key + "connected", true);
-                                    if(XTablesManager.getInstance().isReady()) XTablesManager.getInstance().getXtClient().putString(XTablesManager.ROOT_NAME + this.key + "mode", videoModeToString(cvSource.getVideoMode()));
-                                    if(XTablesManager.getInstance().isReady()) XTablesManager.getInstance().getXtClient().putStringList(XTablesManager.ROOT_NAME + this.key + "modes", List.of(getSourceModeValues(cvSource.getHandle())));
+                                    if (XTablesManager.getInstance().isReady())
+                                        XTablesManager.getInstance()
+                                                .getXtClient()
+                                                .putString(XTablesManager.ROOT_NAME + this.key + "source", "cv:");
+                                    if (XTablesManager.getInstance().isReady())
+                                        XTablesManager.getInstance()
+                                                .getXtClient()
+                                                .putBoolean(XTablesManager.ROOT_NAME + this.key + "connected", true);
+                                    if (XTablesManager.getInstance().isReady())
+                                        XTablesManager.getInstance()
+                                                .getXtClient()
+                                                .putString(
+                                                        XTablesManager.ROOT_NAME + this.key + "mode",
+                                                        videoModeToString(cvSource.getVideoMode()));
+                                    if (XTablesManager.getInstance().isReady())
+                                        XTablesManager.getInstance()
+                                                .getXtClient()
+                                                .putStringList(
+                                                        XTablesManager.ROOT_NAME + this.key + "modes",
+                                                        List.of(getSourceModeValues(cvSource.getHandle())));
                                     updateStreamValues();
-                                }catch (Exception e) {
+                                } catch (Exception e) {
                                     e.printStackTrace();
                                 }
                             }
@@ -89,11 +104,14 @@ public class MJPGFrameConsumer implements AutoCloseable {
 
         String[] streamAddresses = values.toArray(new String[0]);
         try {
-            if(XTablesManager.getInstance().isReady()) XTablesManager.getInstance().getXtClient().putStringList(XTablesManager.ROOT_NAME + this.key + "streams", List.of(streamAddresses));
+            if (XTablesManager.getInstance().isReady())
+                XTablesManager.getInstance()
+                        .getXtClient()
+                        .putStringList(
+                                XTablesManager.ROOT_NAME + this.key + "streams", List.of(streamAddresses));
         } catch (Exception e) {
             e.printStackTrace();
         }
-
     }
 
     public MJPGFrameConsumer(String name, int port) {
@@ -155,7 +173,10 @@ public class MJPGFrameConsumer implements AutoCloseable {
     @Override
     public void close() {
         try {
-            if(XTablesManager.getInstance().isReady()) XTablesManager.getInstance().getXtClient().putBoolean(XTablesManager.ROOT_NAME + this.key + "connected", false);
+            if (XTablesManager.getInstance().isReady())
+                XTablesManager.getInstance()
+                        .getXtClient()
+                        .putBoolean(XTablesManager.ROOT_NAME + this.key + "connected", false);
         } catch (Exception e) {
             e.printStackTrace();
         }

@@ -275,7 +275,7 @@ public class Main {
 
         logger.debug("Loading HardwareManager...");
         // Force load the hardware manager
-        HardwareManager.getInstance();
+//        HardwareManager.getInstance();
 
         logger.debug("Loading NetworkManager...");
         NetworkManager.getInstance().reinitialize();

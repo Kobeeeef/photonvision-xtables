@@ -49,15 +49,15 @@ public class HardwareManager {
     @SuppressWarnings({"FieldCanBeLocal", "unused"})
     private final StatusLED statusLED;
 
-    @SuppressWarnings("FieldCanBeLocal")
-    private final IntegerSubscriber ledModeRequest;
+//    @SuppressWarnings("FieldCanBeLocal")
+////    private final IntegerSubscriber ledModeRequest;
+//
+////    private final IntegerPublisher ledModeState;
+//
+//    @SuppressWarnings({"FieldCanBeLocal", "unused"})
+//    private final NTDataChangeListener ledModeListener;
 
-    private final IntegerPublisher ledModeState;
-
-    @SuppressWarnings({"FieldCanBeLocal", "unused"})
-    private final NTDataChangeListener ledModeListener;
-
-    public final VisionLED visionLED; // May be null if no LED is specified
+//    public final VisionLED visionLED; // May be null if no LED is specified
 
     private final PigpioSocket pigpioSocket; // will be null unless on Raspi
 
@@ -76,14 +76,14 @@ public class HardwareManager {
         this.metricsManager = new MetricsManager();
         this.metricsManager.setConfig(hardwareConfig);
 
-        ledModeRequest =
-                NetworkTablesManager.getInstance()
-                        .kRootTable
-                        .getIntegerTopic("ledModeRequest")
-                        .subscribe(-1);
-        ledModeState =
-                NetworkTablesManager.getInstance().kRootTable.getIntegerTopic("ledModeState").publish();
-        ledModeState.set(VisionLEDMode.kDefault.value);
+//        ledModeRequest =
+//                NetworkTablesManager.getInstance()
+//                        .kRootTable
+//                        .getIntegerTopic("ledModeRequest")
+//                        .subscribe(-1);
+//        ledModeState =
+//                NetworkTablesManager.getInstance().kRootTable.getIntegerTopic("ledModeState").publish();
+//        ledModeState.set(VisionLEDMode.kDefault.value);
 
         CustomGPIO.setConfig(hardwareConfig);
 
@@ -103,30 +103,30 @@ public class HardwareManager {
         }
 
         var hasBrightnessRange = hardwareConfig.ledBrightnessRange.size() == 2;
-        visionLED =
-                hardwareConfig.ledPins.isEmpty()
-                        ? null
-                        : new VisionLED(
-                                hardwareConfig.ledPins,
-                                hasBrightnessRange ? hardwareConfig.ledBrightnessRange.get(0) : 0,
-                                hasBrightnessRange ? hardwareConfig.ledBrightnessRange.get(1) : 100,
-                                pigpioSocket,
-                                ledModeState::set);
+//        visionLED =
+//                hardwareConfig.ledPins.isEmpty()
+//                        ? null
+//                        : new VisionLED(
+//                                hardwareConfig.ledPins,
+//                                hasBrightnessRange ? hardwareConfig.ledBrightnessRange.get(0) : 0,
+//                                hasBrightnessRange ? hardwareConfig.ledBrightnessRange.get(1) : 100,
+//                                pigpioSocket,
+//                                ledModeState::set);
 
-        ledModeListener =
-                visionLED == null
-                        ? null
-                        : new NTDataChangeListener(
-                                NetworkTablesManager.getInstance().kRootTable.getInstance(),
-                                ledModeRequest,
-                                visionLED::onLedModeChange);
+//        ledModeListener =
+//                visionLED == null
+//                        ? null
+//                        : new NTDataChangeListener(
+//                                NetworkTablesManager.getInstance().kRootTable.getInstance(),
+//                                ledModeRequest,
+//                                visionLED::onLedModeChange);
 
         Runtime.getRuntime().addShutdownHook(new Thread(this::onJvmExit));
 
-        if (visionLED != null) {
-            visionLED.setBrightness(hardwareSettings.ledBrightnessPercentage);
-            visionLED.blink(85, 4); // bootup blink
-        }
+//        if (visionLED != null) {
+//            visionLED.setBrightness(hardwareSettings.ledBrightnessPercentage);
+//            visionLED.blink(85, 4); // bootup blink
+//        }
 
         // Start hardware metrics thread (Disabled until implemented)
         // if (Platform.isLinux()) MetricsPublisher.getInstance().startTask();
@@ -135,7 +135,7 @@ public class HardwareManager {
     public void setBrightnessPercent(int percent) {
         if (percent != hardwareSettings.ledBrightnessPercentage) {
             hardwareSettings.ledBrightnessPercentage = percent;
-            if (visionLED != null) visionLED.setBrightness(percent);
+//            if (visionLED != null) visionLED.setBrightness(percent);
             ConfigManager.getInstance().requestSave();
             logger.info("Setting led brightness to " + percent + "%");
         }
@@ -143,7 +143,7 @@ public class HardwareManager {
 
     private void onJvmExit() {
         logger.info("Shutting down LEDs...");
-        if (visionLED != null) visionLED.setState(false);
+//        if (visionLED != null) visionLED.setState(false);
 
         ConfigManager.getInstance().onJvmExit();
     }

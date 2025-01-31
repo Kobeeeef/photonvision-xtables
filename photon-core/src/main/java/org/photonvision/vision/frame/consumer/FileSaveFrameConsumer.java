@@ -17,23 +17,18 @@
 
 package org.photonvision.vision.frame.consumer;
 
-import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.networktables.IntegerEntry;
-import edu.wpi.first.networktables.IntegerSubscriber;
-import edu.wpi.first.networktables.NetworkTable;
-import edu.wpi.first.networktables.StringSubscriber;
+import org.opencv.imgcodecs.Imgcodecs;
+import org.photonvision.common.configuration.ConfigManager;
+import org.photonvision.common.logging.LogGroup;
+import org.photonvision.common.logging.Logger;
+import org.photonvision.vision.frame.StaticFrames;
+import org.photonvision.vision.opencv.CVMat;
+
 import java.io.File;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.function.Consumer;
-import org.opencv.imgcodecs.Imgcodecs;
-import org.photonvision.common.configuration.ConfigManager;
-import org.photonvision.common.dataflow.networktables.NetworkTablesManager;
-import org.photonvision.common.logging.LogGroup;
-import org.photonvision.common.logging.Logger;
-import org.photonvision.vision.frame.StaticFrames;
-import org.photonvision.vision.opencv.CVMat;
 
 public class FileSaveFrameConsumer implements Consumer<CVMat> {
     private final Logger logger = new Logger(FileSaveFrameConsumer.class, LogGroup.General);
@@ -88,36 +83,37 @@ public class FileSaveFrameConsumer implements Consumer<CVMat> {
 
         // The requested count is greater than the actual count
 //        if (savedImagesCount < currentCount) {
-            Date now = new Date();
+        if (1 == 1) return;
+        Date now = new Date();
 
-            String fileName =
-                    cameraNickname
-                            + "_"
-                            + streamType
-                            + "_"
-                            + df.format(now)
-                            + "T"
-                            + tf.format(now)
-                            + "_"
-                            + "THIS-WAS-REMOVED-KOBE";
+        String fileName =
+                cameraNickname
+                        + "_"
+                        + streamType
+                        + "_"
+                        + df.format(now)
+                        + "T"
+                        + tf.format(now)
+                        + "_"
+                        + "THIS-WAS-REMOVED-KOBE";
 
-            // Check if the Unique Camera directory exists and create it if it doesn't
-            String cameraPath = FILE_PATH + File.separator + this.cameraUniqueName;
-            var cameraDir = new File(cameraPath);
-            if (!cameraDir.exists()) {
-                cameraDir.mkdir();
-            }
+        // Check if the Unique Camera directory exists and create it if it doesn't
+        String cameraPath = FILE_PATH + File.separator + this.cameraUniqueName;
+        var cameraDir = new File(cameraPath);
+        if (!cameraDir.exists()) {
+            cameraDir.mkdir();
+        }
 
-            String saveFilePath = cameraPath + File.separator + fileName + FILE_EXTENSION;
+        String saveFilePath = cameraPath + File.separator + fileName + FILE_EXTENSION;
 
-            if (image == null || image.getMat() == null || image.getMat().empty()) {
-                Imgcodecs.imwrite(saveFilePath, StaticFrames.LOST_MAT);
-            } else {
-                Imgcodecs.imwrite(saveFilePath, image.getMat());
-            }
+        if (image == null || image.getMat() == null || image.getMat().empty()) {
+            Imgcodecs.imwrite(saveFilePath, StaticFrames.LOST_MAT);
+        } else {
+            Imgcodecs.imwrite(saveFilePath, image.getMat());
+        }
 
-            savedImagesCount++;
-            logger.info("Saved new image at " + saveFilePath);
+        savedImagesCount++;
+        logger.info("Saved new image at " + saveFilePath);
 //        } else if (savedImagesCount > currentCount) {
 //            // Reset local value with NT value in case of de-sync
 //            savedImagesCount = currentCount;
@@ -169,7 +165,6 @@ public class FileSaveFrameConsumer implements Consumer<CVMat> {
 //                matchTypes[MathUtil.clamp((int) matchType.value, 0, matchTypes.length - 1)];
 //        return matchTypeStr + "-" + matchNum.value + "-" + eventName.value;
 //    }
-
     public void close() {
         // troododfa;lkjadsf;lkfdsaj otgooadflsk;j
     }

@@ -99,8 +99,8 @@ public class VisionModuleChangeSubscriber extends DataChangeSubscriber {
                     case "deleteCurrPipeline" -> deleteCurrPipeline();
                     case "changePipeline" -> changePipeline((Integer) newPropValue);
                     case "startCalibration" -> startCalibration((Map<String, Object>) newPropValue);
-                    case "saveInputSnapshot" -> parentModule.saveInputSnapshot();
-                    case "saveOutputSnapshot" -> parentModule.saveOutputSnapshot();
+//                    case "saveInputSnapshot" -> parentModule.saveInputSnapshot();
+//                    case "saveOutputSnapshot" -> parentModule.saveOutputSnapshot();
                     case "takeCalSnapshot" -> parentModule.takeCalibrationSnapshot();
                     case "duplicatePipeline" -> duplicatePipeline((Integer) newPropValue);
                     case "calibrationUploaded" -> {

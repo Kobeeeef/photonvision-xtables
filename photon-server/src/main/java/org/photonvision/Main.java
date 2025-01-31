@@ -279,10 +279,6 @@ public class Main {
 
         logger.debug("Loading NetworkManager...");
         NetworkManager.getInstance().reinitialize();
-        logger.debug("Loading NetworkTablesManager...");
-        NetworkTablesManager.getInstance()
-                .setConfig(ConfigManager.getInstance().getConfig().getNetworkConfig());
-        NetworkTablesManager.getInstance().registerTimedTasks();
 
         logger.info("Loading XTABLES...");
         XTablesManager.getInstance();

@@ -39,15 +39,7 @@ import org.photonvision.vision.target.TrackedTarget;
 public class NTDataPublisher implements CVPipelineResultConsumer {
     private final Logger logger = new Logger(NTDataPublisher.class, LogGroup.General);
 
-    private final NetworkTable rootTable = NetworkTablesManager.getInstance().kRootTable;
 
-    NTDataChangeListener pipelineIndexListener;
-    private final Supplier<Integer> pipelineIndexSupplier;
-    private final Consumer<Integer> pipelineIndexConsumer;
-
-    NTDataChangeListener driverModeListener;
-    private final BooleanSupplier driverModeSupplier;
-    private final Consumer<Boolean> driverModeConsumer;
     private String cameraNickname;
 
     public NTDataPublisher(
@@ -59,66 +51,62 @@ public class NTDataPublisher implements CVPipelineResultConsumer {
         this.cameraNickname = XTablesManager.ROOT_NAME + cameraNicknameInst + ".";
 
         updateCameraNickname(cameraNicknameInst);
-        this.pipelineIndexSupplier = pipelineIndexSupplier;
-        this.pipelineIndexConsumer = pipelineIndexConsumer;
-        this.driverModeSupplier = driverModeSupplier;
-        this.driverModeConsumer = driverModeConsumer;
 
-        updateEntries();
+
     }
 
-    private void onPipelineIndexChange(NetworkTableEvent entryNotification) {
-        var newIndex = (int) entryNotification.valueData.value.getInteger();
-        var originalIndex = pipelineIndexSupplier.get();
+//    private void onPipelineIndexChange(NetworkTableEvent entryNotification) {
+//        var newIndex = (int) entryNotification.valueData.value.getInteger();
+//        var originalIndex = pipelineIndexSupplier.get();
+//
+//        // ignore indexes below 0
+//        if (newIndex < 0) {
+//            if (XTablesManager.getInstance().isReady())
+//                XTablesManager.getInstance()
+//                        .getXtClient()
+//                        .putInteger(cameraNickname + "pipelineIndexState", originalIndex);
+//            return;
+//        }
+//
+//        if (newIndex == originalIndex) {
+//            logger.debug("Pipeline index is already " + newIndex);
+//            return;
+//        }
+//
+//        pipelineIndexConsumer.accept(newIndex);
+//        var setIndex = pipelineIndexSupplier.get();
+//        if (newIndex != setIndex) { // set failed
+//            if (XTablesManager.getInstance().isReady())
+//                XTablesManager.getInstance()
+//                        .getXtClient()
+//                        .putInteger(cameraNickname + "pipelineIndexState", setIndex);
+//            // TODO: Log
+//        }
+//        logger.debug("Set pipeline index to " + newIndex);
+//    }
 
-        // ignore indexes below 0
-        if (newIndex < 0) {
-            if (XTablesManager.getInstance().isReady())
-                XTablesManager.getInstance()
-                        .getXtClient()
-                        .putInteger(cameraNickname + "pipelineIndexState", originalIndex);
-            return;
-        }
-
-        if (newIndex == originalIndex) {
-            logger.debug("Pipeline index is already " + newIndex);
-            return;
-        }
-
-        pipelineIndexConsumer.accept(newIndex);
-        var setIndex = pipelineIndexSupplier.get();
-        if (newIndex != setIndex) { // set failed
-            if (XTablesManager.getInstance().isReady())
-                XTablesManager.getInstance()
-                        .getXtClient()
-                        .putInteger(cameraNickname + "pipelineIndexState", setIndex);
-            // TODO: Log
-        }
-        logger.debug("Set pipeline index to " + newIndex);
-    }
-
-    private void onDriverModeChange(NetworkTableEvent entryNotification) {
-        var newDriverMode = entryNotification.valueData.value.getBoolean();
-        var originalDriverMode = driverModeSupplier.getAsBoolean();
-
-        if (newDriverMode == originalDriverMode) {
-            logger.debug("Driver mode is already " + newDriverMode);
-            return;
-        }
-
-        driverModeConsumer.accept(newDriverMode);
-        logger.debug("Set driver mode to " + newDriverMode);
-    }
-
-    private void removeEntries() {
-        if (pipelineIndexListener != null) pipelineIndexListener.remove();
-        if (driverModeListener != null) driverModeListener.remove();
-    }
-
-    private void updateEntries() {
-        if (pipelineIndexListener != null) pipelineIndexListener.remove();
-        if (driverModeListener != null) driverModeListener.remove();
-    }
+//    private void onDriverModeChange(NetworkTableEvent entryNotification) {
+//        var newDriverMode = entryNotification.valueData.value.getBoolean();
+//        var originalDriverMode = driverModeSupplier.getAsBoolean();
+//
+//        if (newDriverMode == originalDriverMode) {
+//            logger.debug("Driver mode is already " + newDriverMode);
+//            return;
+//        }
+//
+//        driverModeConsumer.accept(newDriverMode);
+//        logger.debug("Set driver mode to " + newDriverMode);
+//    }
+//
+//    private void removeEntries() {
+//        if (pipelineIndexListener != null) pipelineIndexListener.remove();
+//        if (driverModeListener != null) driverModeListener.remove();
+//    }
+//
+//    private void updateEntries() {
+//        if (pipelineIndexListener != null) pipelineIndexListener.remove();
+//        if (driverModeListener != null) driverModeListener.remove();
+//    }
 
     public void updateCameraNickname(String newCameraNickname) {
         this.cameraNickname = XTablesManager.ROOT_NAME + newCameraNickname + ".";
@@ -140,26 +128,26 @@ public class NTDataPublisher implements CVPipelineResultConsumer {
                             List.of(),
                             result.inputAndOutputFrame);
         else acceptedResult = result;
-        var now = NetworkTablesJNI.now();
-        var captureMicros = MathUtils.nanosToMicros(result.getImageCaptureTimestampNanos());
-
-        var offset = NetworkTablesManager.getInstance().getOffset();
-
-        // Transform the metadata timestamps from the local nt::Now timebase to the Time Sync Server's
-        // timebase
-        var simplified =
-                new PhotonPipelineResult(
-                        acceptedResult.sequenceID,
-                        captureMicros + offset,
-                        now + offset,
-                        NetworkTablesManager.getInstance().getTimeSinceLastPong(),
-                        TrackedTarget.simpleFromTrackedTargets(acceptedResult.targets),
-                        acceptedResult.multiTagResult);
+//        var now = NetworkTablesJNI.now();
+//        var captureMicros = MathUtils.nanosToMicros(result.getImageCaptureTimestampNanos());
+//
+//        var offset = NetworkTablesManager.getInstance().getOffset();
+//
+//        // Transform the metadata timestamps from the local nt::Now timebase to the Time Sync Server's
+//        // timebase
+//        var simplified =
+//                new PhotonPipelineResult(
+//                        acceptedResult.sequenceID,
+//                        captureMicros + offset,
+//                        now + offset,
+//                        NetworkTablesManager.getInstance().getTimeSinceLastPong(),
+//                        TrackedTarget.simpleFromTrackedTargets(acceptedResult.targets),
+//                        acceptedResult.multiTagResult);
 
         // random guess at size of the array
         BatchedPushRequests batchedPushRequests = new BatchedPushRequests();
-        batchedPushRequests.putInteger(
-                cameraNickname + "pipelineIndexState", pipelineIndexSupplier.get());
+//        batchedPushRequests.putInteger(
+//                cameraNickname + "pipelineIndexState", pipelineIndexSupplier.get());
         batchedPushRequests.putDouble(
                 cameraNickname + "latencyMillis", acceptedResult.getLatencyMillis());
         batchedPushRequests.putBoolean(cameraNickname + "hasTarget", acceptedResult.hasTargets());

@@ -44,8 +44,8 @@ public class USBFrameProvider extends CpuImageProcessor {
 
     private long lastTime = 0;
 
-    // subscribers are lightweight, and I'm lazy
-    private final BooleanSubscriber useNewBehaviorSub;
+//    // subscribers are lightweight, and I'm lazy
+//    private final BooleanSubscriber useNewBehaviorSub;
 
     @SuppressWarnings("SpellCheckingInspection")
     public USBFrameProvider(
@@ -59,10 +59,10 @@ public class USBFrameProvider extends CpuImageProcessor {
 
         this.settables = visionSettables;
 
-        var useNewBehaviorTopic =
-                NetworkTablesManager.getInstance().kRootTable.getBooleanTopic("use_new_cscore_frametime");
+//        var useNewBehaviorTopic =
+//                NetworkTablesManager.getInstance().kRootTable.getBooleanTopic("use_new_cscore_frametime");
 
-        useNewBehaviorSub = useNewBehaviorTopic.subscribe(false);
+//        useNewBehaviorSub = useNewBehaviorTopic.subscribe(false);
         this.connectedCallback = connectedCallback;
     }
 
@@ -86,22 +86,22 @@ public class USBFrameProvider extends CpuImageProcessor {
             onCameraConnected();
         }
 
-        if (!useNewBehaviorSub.get()) {
-            // We allocate memory so we don't fill a Mat in use by another thread (memory model is easier)
-            var mat = new CVMat();
-            // This is from wpi::Now, or WPIUtilJNI.now(). The epoch from grabFrame is uS since
-            // Hal::initialize was called
-            // TODO - under the hood, this incurs an extra copy. We should avoid this, if we
-            // can.
-            long captureTimeNs = cvSink.grabFrame(mat.getMat(), CSCORE_DEFAULT_FRAME_TIMEOUT) * 1000;
-
-            if (captureTimeNs == 0) {
-                var error = cvSink.getError();
-                logger.error("Error grabbing image: " + error);
-            }
-
-            return new CapturedFrame(mat, settables.getFrameStaticProperties(), captureTimeNs);
-        } else {
+//        if (!useNewBehaviorSub.get()) {
+//            // We allocate memory so we don't fill a Mat in use by another thread (memory model is easier)
+//            var mat = new CVMat();
+//            // This is from wpi::Now, or WPIUtilJNI.now(). The epoch from grabFrame is uS since
+//            // Hal::initialize was called
+//            // TODO - under the hood, this incurs an extra copy. We should avoid this, if we
+//            // can.
+//            long captureTimeNs = cvSink.grabFrame(mat.getMat(), CSCORE_DEFAULT_FRAME_TIMEOUT) * 1000;
+//
+//            if (captureTimeNs == 0) {
+//                var error = cvSink.getError();
+//                logger.error("Error grabbing image: " + error);
+//            }
+//
+//            return new CapturedFrame(mat, settables.getFrameStaticProperties(), captureTimeNs);
+//        } else {
             // We allocate memory so we don't fill a Mat in use by another thread (memory model is easier)
             // TODO - consider a frame pool
             // TODO - getCurrentVideoMode is a JNI call for us, but profiling indicates it's fast
@@ -137,7 +137,7 @@ public class USBFrameProvider extends CpuImageProcessor {
             }
 
             return new CapturedFrame(ret, settables.getFrameStaticProperties(), captureTimeUs * 1000);
-        }
+//        }
     }
 
     @Override

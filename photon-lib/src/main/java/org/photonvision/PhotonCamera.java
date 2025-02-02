@@ -60,12 +60,8 @@ public class PhotonCamera implements AutoCloseable {
 
     private final NetworkTable cameraTable;
     PacketSubscriber<PhotonPipelineResult> resultSubscriber;
-    BooleanPublisher driverModePublisher;
-    BooleanSubscriber driverModeSubscriber;
     StringSubscriber versionEntry;
-    IntegerEntry inputSaveImgEntry, outputSaveImgEntry;
-    IntegerPublisher pipelineIndexRequest, ledModeRequest;
-    IntegerSubscriber pipelineIndexState, ledModeState;
+    IntegerSubscriber pipelineIndexState;
     IntegerSubscriber heartbeatEntry;
     DoubleArraySubscriber cameraIntrinsicsSubscriber;
     DoubleArraySubscriber cameraDistortionSubscriber;
@@ -75,16 +71,8 @@ public class PhotonCamera implements AutoCloseable {
     @Override
     public void close() {
         resultSubscriber.close();
-        driverModePublisher.close();
-        driverModeSubscriber.close();
         versionEntry.close();
-        inputSaveImgEntry.close();
-        outputSaveImgEntry.close();
-        pipelineIndexRequest.close();
         pipelineIndexState.close();
-        ledModeRequest.close();
-        ledModeState.close();
-        pipelineIndexRequest.close();
         cameraIntrinsicsSubscriber.close();
         cameraDistortionSubscriber.close();
         topicNameSubscriber.close();

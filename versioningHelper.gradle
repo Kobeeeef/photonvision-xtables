@@ -26,7 +26,7 @@ gradle.allprojects {
     }
 
     if (!ext.has("versionString")) {
-        ext.versionString = getCurrentVersion()
+        ext.versionString = "v2025.1.1"
     }
 
     ext.writePhotonVersionFile = {File versionFileIn, Path path, String version ->

@@ -7,7 +7,7 @@ apply from: "${rootDir}/shared/common.gradle"
 
 dependencies {
 
-    implementation "org.kobe.xbot:xtables:4.6.9"
+    implementation "org.kobe.xbot:xtables:4.8.0"
 
     implementation project(':photon-core')
 

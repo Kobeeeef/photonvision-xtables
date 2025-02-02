@@ -131,11 +131,6 @@ public class PhotonCamera implements AutoCloseable {
                                 PubSubOption.sendAll(true),
                                 PubSubOption.pollStorage(20));
         resultSubscriber = new PacketSubscriber<>(rawBytesEntry, PhotonPipelineResult.photonStruct);
-        driverModePublisher = cameraTable.getBooleanTopic("driverModeRequest").publish();
-        driverModeSubscriber = cameraTable.getBooleanTopic("driverMode").subscribe(false);
-        inputSaveImgEntry = cameraTable.getIntegerTopic("inputSaveImgCmd").getEntry(0);
-        outputSaveImgEntry = cameraTable.getIntegerTopic("outputSaveImgCmd").getEntry(0);
-        pipelineIndexRequest = cameraTable.getIntegerTopic("pipelineIndexRequest").publish();
         pipelineIndexState = cameraTable.getIntegerTopic("pipelineIndexState").subscribe(0);
         heartbeatEntry = cameraTable.getIntegerTopic("heartbeat").subscribe(-1);
         cameraIntrinsicsSubscriber =
@@ -143,8 +138,6 @@ public class PhotonCamera implements AutoCloseable {
         cameraDistortionSubscriber =
                 cameraTable.getDoubleArrayTopic("cameraDistortion").subscribe(null);
 
-        ledModeRequest = rootPhotonTable.getIntegerTopic("ledModeRequest").publish();
-        ledModeState = rootPhotonTable.getIntegerTopic("ledModeState").subscribe(-1);
         versionEntry = rootPhotonTable.getStringTopic("version").subscribe("");
 
         // Existing is enough to make this multisubscriber do its thing
@@ -192,29 +185,6 @@ public class PhotonCamera implements AutoCloseable {
         return ret;
     }
 
-    /**
-     * Returns the latest pipeline result. This is simply the most recent result Received via NT.
-     * Calling this multiple times will always return the most recent result.
-     *
-     * <p>Replaced by {@link #getAllUnreadResults()} over getLatestResult, as this function can miss
-     * results, or provide duplicate ones!
-     */
-    @Deprecated(since = "2024", forRemoval = true)
-    public PhotonPipelineResult getLatestResult() {
-        verifyVersion();
-
-        // Grab the latest result. We don't care about the timestamp from NT - the metadata header has
-        // this, latency compensated by the Time Sync Client
-        var ret = resultSubscriber.get();
-
-        if (ret.timestamp == 0) return new PhotonPipelineResult();
-
-        var result = ret.value;
-
-        checkTimeSyncOrWarn(result);
-
-        return result;
-    }
 
     private void checkTimeSyncOrWarn(PhotonPipelineResult result) {
         if (result.metadata.timeSinceLastPong > 5L * 1000000L) {
@@ -235,43 +205,6 @@ public class PhotonCamera implements AutoCloseable {
         }
     }
 
-    /**
-     * Returns whether the camera is in driver mode.
-     *
-     * @return Whether the camera is in driver mode.
-     */
-    public boolean getDriverMode() {
-        return driverModeSubscriber.get();
-    }
-
-    /**
-     * Toggles driver mode.
-     *
-     * @param driverMode Whether to set driver mode.
-     */
-    public void setDriverMode(boolean driverMode) {
-        driverModePublisher.set(driverMode);
-    }
-
-    /**
-     * Request the camera to save a new image file from the input camera stream with overlays. Images
-     * take up space in the filesystem of the PhotonCamera. Calling it frequently will fill up disk
-     * space and eventually cause the system to stop working. Clear out images in
-     * /opt/photonvision/photonvision_config/imgSaves frequently to prevent issues.
-     */
-    public void takeInputSnapshot() {
-        inputSaveImgEntry.set(inputSaveImgEntry.get() + 1);
-    }
-
-    /**
-     * Request the camera to save a new image file from the output stream with overlays. Images take
-     * up space in the filesystem of the PhotonCamera. Calling it frequently will fill up disk space
-     * and eventually cause the system to stop working. Clear out images in
-     * /opt/photonvision/photonvision_config/imgSaves frequently to prevent issues.
-     */
-    public void takeOutputSnapshot() {
-        outputSaveImgEntry.set(outputSaveImgEntry.get() + 1);
-    }
 
     /**
      * Returns the active pipeline index.
@@ -280,39 +213,6 @@ public class PhotonCamera implements AutoCloseable {
      */
     public int getPipelineIndex() {
         return (int) pipelineIndexState.get(0);
-    }
-
-    /**
-     * Allows the user to select the active pipeline index.
-     *
-     * @param index The active pipeline index.
-     */
-    public void setPipelineIndex(int index) {
-        pipelineIndexRequest.set(index);
-    }
-
-    /**
-     * Returns the current LED mode.
-     *
-     * @return The current LED mode.
-     */
-    public VisionLEDMode getLEDMode() {
-        int value = (int) ledModeState.get(-1);
-        return switch (value) {
-            case 0 -> VisionLEDMode.kOff;
-            case 1 -> VisionLEDMode.kOn;
-            case 2 -> VisionLEDMode.kBlink;
-            default -> VisionLEDMode.kDefault;
-        };
-    }
-
-    /**
-     * Sets the LED mode.
-     *
-     * @param led The mode to set to.
-     */
-    public void setLED(VisionLEDMode led) {
-        ledModeRequest.set(led.value);
     }
 
     /**
@@ -444,8 +344,7 @@ public class PhotonCamera implements AutoCloseable {
                             + ">>> You MUST update PhotonVision,            \n"
                             + ">>> PhotonLib, or both.                      \n"
                             + ">>>                                          \n"
-                            + ">>> Your code will now crash.                \n"
-                            + ">>> We hope your day gets better.            \n"
+                            + ">>> Your code will not crash - kobe.         \n"
                             + ">>>                                          \n"
                             + ">>> !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n"
                             + ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\n";

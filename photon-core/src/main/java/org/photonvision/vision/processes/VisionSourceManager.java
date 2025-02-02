@@ -299,6 +299,7 @@ public class VisionSourceManager {
         UsbCameraInfo[] usbCameraInfoArray = new UsbCameraInfo[] {
                 new UsbCameraInfo(0, "/dev/bw_camera", "PhotonCamera", new String[]{"This camera is using a symlink."}, 3141, 25446)
         };
+
         Stream.of(usbCameraInfoArray)
                 .map(c -> PVCameraInfo.fromUsbCameraInfo(c))
                 .filter(c -> !(String.join("", c.otherPaths()).contains("csi-video")))
